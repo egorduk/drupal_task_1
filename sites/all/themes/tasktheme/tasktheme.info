@@ -1,0 +1,17 @@
+name = TaskTheme
+description = Theme for task
+package = Core
+version = VERSION
+core = 7.x
+stylesheets[all][] = css/style.css
+stylesheets[print][] = print.css
+
+regions[header_menu] = Menu region
+regions[block1] = Block1 region
+regions[block2] = Block2 region
+regions[block3] = Block3 region
+regions[content] = Content region
+regions[right_sidebar] = Right sidebar region
+
+version = "7.37"
+project = "drupal"
