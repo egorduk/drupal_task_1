@@ -1,8 +1,9 @@
 <?php
 $block = $vars['block'];
 // Задаем переменные $title и $content
-$vars['content'] = $block->content;
+//$vars['content'] = $block->content;
 $vars['title'] = $block->subject;
+//var_dump($vars);die;
 // Задаем классы
 $vars['classes_array'][] = 'block-' . $block->module;
 $vars['classes_array'][] = 'region-' . $vars['block_zebra'];

@@ -46,8 +46,17 @@
             <?php print render($page['right_sidebar']);?>
         </div>
     </div>
+    <?php
+    $page = drupal_get_form('user_login');
+    print drupal_render($page);
+    $page = drupal_get_form('user_register_form');
+    print drupal_render($page);
+    $page = drupal_get_form('user_pass');
+    print drupal_render($page);
+    ?>
 </div>
 <div id="footer">
+    <?php print render($page['footer']);?>
     <p>Copyright (c) 2015</p>
 </div>
 </body>

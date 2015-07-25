@@ -12,6 +12,7 @@ regions[block2] = Block2 region
 regions[block3] = Block3 region
 regions[content] = Content region
 regions[right_sidebar] = Right sidebar region
+regions[footer] = Footer region
 
 version = "7.37"
 project = "drupal"

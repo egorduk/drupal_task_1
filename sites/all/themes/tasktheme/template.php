@@ -34,6 +34,30 @@ function tasktheme_theme(&$existing, $type, $theme, $path) {
                     'tasktheme_process',
                 ),
             ),
+            'user_login' => array(
+                'render element' => 'form',
+                'path' => drupal_get_path('theme', 'tasktheme') . '/templates',
+                'template' => 'user-login',
+                'preprocess functions' => array(
+                    'tasktheme_preprocess_user_login'
+                )
+            ),
+            'user_register_form' => array(
+                'render element' => 'form',
+                'path' => drupal_get_path('theme', 'tasktheme') . '/templates',
+                'template' => 'user-register-form',
+                'preprocess functions' => array(
+                    'tasktheme_preprocess_user_register_form'
+                ),
+            ),
+            'user_pass' => array(
+                'render element' => 'form',
+                'path' => drupal_get_path('theme', 'tasktheme') . '/templates',
+                'template' => 'user-pass',
+                'preprocess functions' => array(
+                    'tasktheme_preprocess_user_pass'
+                ),
+            ),
             'header' => array(
                 'arguments' => array('elements' => NULL),
                 'path' => drupal_get_path('theme', 'tasktheme') . '/templates',
@@ -76,7 +100,6 @@ function tasktheme_blocks($region) {
     }
 }
 
-
 function tasktheme_preprocess(&$vars, $hook) {
     $key = ($hook == 'page' || $hook == 'maintenance_page') ? 'body_classes' : 'classes';
     if (array_key_exists($key, $vars)) {
@@ -112,7 +135,6 @@ function _tasktheme_path() {
     return $path;
 }
 
-
 if (!function_exists('drupal_html_class')) {
     function drupal_html_class($class) {
         $class = strtr(drupal_strtolower($class), array(' ' => '-', '_' => '-', '/' => '-', '[' => '-', ']' => ''));
@@ -126,5 +148,24 @@ if (!function_exists('drupal_html_id')) {
         $id = strtr(drupal_strtolower($id), array(' ' => '-', '_' => '-', '[' => '-', ']' => ''));
         $id = preg_replace('/[^A-Za-z0-9\-_]/', '', $id);
         return $id;
+    }
+}
+
+function tasktheme_form_alter(&$form, &$form_state, $form_id) {
+    if ($form['#theme'][0] == 'user_login') {
+        $form['name']['#title'] = t("Login");
+        $form['pass']['#title'] = t("Password");
+        $form['actions']['submit']['#value'] = t("Log in");
+        $form['name']['#description'] = t('');
+        $form['pass']['#description'] = t('');
+        if (module_exists('captcha')) {
+            $form['captcha'] = t('');
+        }
+    } elseif ($form['#theme'][0] == 'user_register_form') {
+        $form['account']['mail']['#description'] = t('');
+        $form['account']['name']['#description'] = t('');
+        $form['account']['name']['#title'] = t('Login');
+    } elseif ($form['#theme'][0] == 'user_pass') {
+
     }
 }

@@ -32,3 +32,5 @@ if (!$vars['is_front']) {
     }
     $vars['classes_array'][] = drupal_html_class('section-' . $section);
 }
+//var_dump(drupal_get_form('user_login'));die;
+
