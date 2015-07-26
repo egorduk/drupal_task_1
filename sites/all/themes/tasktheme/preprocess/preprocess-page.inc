@@ -1,10 +1,8 @@
 <?php
-if ($index = array_search(preg_replace('![^abcdefghijklmnopqrstuvwxyz0-9-_]+!s', '', 'page-'. drupal_strtolower(arg( 0))), $vars['classes_array'])) {
+/*if ($index = array_search(preg_replace('![^abcdefghijklmnopqrstuvwxyz0-9-_]+!s', '', 'page-'. drupal_strtolower(arg( 0))), $vars['classes_array'])) {
     unset($vars['classes_array'][$index]);
-}
-// Определяем шаблон и переменные для шапки и подвала
+}*/
 $vars['header'] = theme('header', array(
-    // Имя переменной => значение
     'front_page' => $vars['front_page'],
     'logo' => $vars['logo'],
     //'search_box' => $vars['search_box'],
@@ -16,7 +14,7 @@ $vars['footer'] = theme('footer', array(
     //'page_bottom' => $vars['page_bottom'],
 ));
 // Определяем дополнительные классы для не_главной страницы
-if (!$vars['is_front']) {
+/*if (!$vars['is_front']) {
     // Добавляем уникальные классы для разных страниц
     $path = drupal_get_path_alias($_GET['q']);
     $vars['classes_array'][] = drupal_html_class('page-' . $path);
@@ -31,6 +29,6 @@ if (!$vars['is_front']) {
         }
     }
     $vars['classes_array'][] = drupal_html_class('section-' . $section);
-}
-//var_dump(drupal_get_form('user_login'));die;
+}*/
+//dpm($vars);
 

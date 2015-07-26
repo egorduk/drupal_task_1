@@ -1,0 +1,76 @@
+<?php
+
+function main_menu() {
+    $items = array();
+    $items['user/reg'] = array(
+        'title' => 'Registration form',
+        'page callback' => 'drupal_get_form',
+        'access callback' => TRUE,
+        'page arguments' => array('main_user_register_form'),
+    );
+    return $items;
+}
+
+function main_user_register_form($form, &$form_state) {
+    $form['login'] = array(
+        '#title' => 'Login',
+        '#description' => '',
+        '#type' => 'textfield',
+        '#size' => 30,
+        '#maxlength' => 10,
+        '#required' => TRUE,
+    );
+    $form['email'] = array(
+        '#title' => 'Email',
+        '#description' => '',
+        '#type' => 'textfield',
+        '#size' => 30,
+        '#maxlength' => 15,
+        '#required' => TRUE,
+    );
+    $form['password'] = array(
+        '#title' => 'Password',
+        '#description' => '',
+        '#type' => 'password',
+        '#size' => 30,
+        '#maxlength' => 10,
+        '#required' => TRUE,
+    );
+    $form['password_approve'] = array(
+        '#title' => 'Approve password',
+        '#description' => '',
+        '#type' => 'password',
+        '#size' => 30,
+        '#maxlength' => 10,
+        '#required' => TRUE,
+    );
+    $form['submit'] = array(
+        '#type' => 'submit',
+        '#value' => t('Sign up'),
+    );
+    return $form;
+}
+
+function main_user_register_form_validate($form, &$form_state) {
+    if (!valid_email_address($form_state['values']['email'])) {
+        form_set_error('email', t('Incorrect email format.'));
+    }
+    if ($form_state['values']['password'] != $form_state['values']['password_approve']) {
+        form_set_error('password_approve', t('Passwords don\'t equal'));
+        //form_set_error('password', t('Passwords don\'t. equal'));
+    }
+}
+
+function main_user_register_form_submit($form, &$form_state){
+    $newUser = array(
+        'name' => $form_state['values']['login'],
+        'pass' => $form_state['values']['password'],
+        'mail' => $form_state['values']['email'],
+        'init' => $form_state['values']['email'],
+        'status' => 1,
+        'access' => REQUEST_TIME,
+        'created' => REQUEST_TIME
+    );
+    user_save(null, $newUser);
+    drupal_set_message("Successful registration.");
+}

@@ -1,0 +1,68 @@
+<?php
+
+function twitter_entity_info() {
+    $return = array(
+        'twitter' => array(
+            'label' => t('Twitter'),
+            'entity class' => 'Twitter',
+            'controller class' => 'TwitterController',
+            'base table' => 'twitter',
+            'fieldable' => TRUE,
+            'load hook' => 'twitter_load',
+            'module' => 'twitter',
+            'entity keys' => array(
+                'id' => 'tid',
+                'label' => ''
+            ),
+            'bundle keys' => array(
+                'bundle' => 'name',
+            ),
+            'bundles' => array(),
+            'view modes' => array(
+                'full' => array(
+                    'label' => t('Full'),
+                    'custom settings' => FALSE,
+                ),
+                'admin' => array(
+                    'label' => t('Admin'),
+                    'custom settings' => TRUE,
+                ),
+            ),
+            'label callback' => 'entity_class_label',
+            'uri callback' => 'entity_class_uri',
+        )
+    );
+    return $return;
+}
+
+
+function twitter_menu() {
+    $items['admin/config/twitter/%twitter'] = array(
+        'title callback' => 'entity_label',
+        //'title arguments' => array('twitter', 1),
+        'page callback' => 'twitter_page_view',
+        'page arguments' => array(1),
+        //'access callback' => TRUE,
+        'access arguments' => array('administer site configuration'),
+        'file' => 'twitter.pages.inc',
+    );
+    $items['admin/config/twitter'] = array(
+        'title callback' => '',
+        //'title arguments' => array('twitter', 1),
+        'page callback' => 'twitter_page_view',
+        //'page arguments' => array(1),
+        //'access callback' => TRUE,
+        'access arguments' => array('administer site configuration'),
+        'file' => 'twitter.pages.inc',
+    );
+    return $items;
+}
+
+function twitter_load($twitter_id, $reset = FALSE) {
+    $products = twitter_load_multiple(array($twitter_id), array(), $reset);
+    return $products ? reset($products) : FALSE;
+}
+
+function twitter_load_multiple($product_ids = array(), $conditions = array(), $reset = FALSE) {
+    return entity_load('twitter', $product_ids, $conditions, $reset);
+}

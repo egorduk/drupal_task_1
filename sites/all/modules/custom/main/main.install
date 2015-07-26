@@ -1,0 +1,9 @@
+<?php
+function main_uninstall() {
+}
+
+function main_schema() {
+}
+
+function main_install() {
+}

@@ -1,0 +1,25 @@
+<?php
+function twitter_uninstall() {
+}
+
+function twitter_schema() {
+    $schema['twitter'] = array(
+                'fields' => array(
+                    'tid' => array('type' => 'serial',  'size' => 'normal',  'not null' => TRUE),
+                    'user_id' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0),
+                    'user_login' => array('type' => 'varchar', 'length' => 50, 'not null' => TRUE),
+                    'user_pass' => array('type' => 'varchar', 'length' => 50, 'not null' => TRUE)
+                ),
+                'primary key' => array('tid'),
+                'foreign keys' => array(
+                              'affected_node' => array(
+                                'table' => 'users',
+                                'columns' => array('user_id' => 'uid'),
+                              ),
+                             )
+            );
+    return $schema;
+}
+
+function twitter_install() {
+}

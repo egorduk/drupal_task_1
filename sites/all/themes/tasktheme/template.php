@@ -50,14 +50,14 @@ function tasktheme_theme(&$existing, $type, $theme, $path) {
                     'tasktheme_preprocess_user_register_form'
                 ),
             ),
-            'user_pass' => array(
+            /*'user_pass' => array(
                 'render element' => 'form',
                 'path' => drupal_get_path('theme', 'tasktheme') . '/templates',
                 'template' => 'user-pass',
                 'preprocess functions' => array(
                     'tasktheme_preprocess_user_pass'
                 ),
-            ),
+            ),*/
             'header' => array(
                 'arguments' => array('elements' => NULL),
                 'path' => drupal_get_path('theme', 'tasktheme') . '/templates',

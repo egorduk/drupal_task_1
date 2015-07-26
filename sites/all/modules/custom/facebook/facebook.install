@@ -1,0 +1,25 @@
+<?php
+function facebook_uninstall() {
+}
+
+function facebook_schema() {
+    $schema['facebook'] = array(
+                'fields' => array(
+                    'fid' => array('type' => 'serial',  'size' => 'normal',  'not null' => TRUE),
+                    'user_id' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0),
+                    'user_login' => array('type' => 'varchar', 'length' => 50, 'not null' => TRUE),
+                    'user_pass' => array('type' => 'varchar', 'length' => 50, 'not null' => TRUE)
+                ),
+                'primary key' => array('fid'),
+                'foreign keys' => array(
+                              'affected_node' => array(
+                                'table' => 'users',
+                                'columns' => array('user_id' => 'uid'),
+                              ),
+                             )
+            );
+    return $schema;
+}
+
+function facebook_install() {
+}

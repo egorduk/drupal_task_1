@@ -27,7 +27,7 @@
         </div>
     </div>
     <div id="page" class="container">
-        <div id="banner"><!--<a href="#"><img src="images/img02.jpg" width="940" height="400" alt="" /></a>--></div>
+        <div id="banner"></div>
         <div id="three-column">
             <div id="column1">
                 <?php print render($page['block1']);?>
@@ -47,12 +47,14 @@
         </div>
     </div>
     <?php
-    $page = drupal_get_form('user_login');
-    print drupal_render($page);
-    $page = drupal_get_form('user_register_form');
-    print drupal_render($page);
-    $page = drupal_get_form('user_pass');
-    print drupal_render($page);
+    if (!$logged_in) {
+        $page = drupal_get_form('user_login');
+        print drupal_render($page);
+        $page = drupal_get_form('main_user_register_form');
+        print drupal_render($page);
+        /*$page = drupal_get_form('user_pass');
+        print drupal_render($page);*/
+    }
     ?>
 </div>
 <div id="footer">
