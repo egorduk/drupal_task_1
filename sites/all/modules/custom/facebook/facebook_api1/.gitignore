@@ -1,4 +1,6 @@
+/coverage/
 vendor/
 composer.lock
-tests/FacebookTestCredentials.php
-
+composer.phar
+.DS_Store
+.idea/

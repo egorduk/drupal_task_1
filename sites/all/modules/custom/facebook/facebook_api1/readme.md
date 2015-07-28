@@ -1,89 +1,130 @@
-# Facebook SDK for PHP
+### New SDK Released
 
-[![Build Status](https://img.shields.io/travis/facebook/facebook-php-sdk-v4/master.svg)](https://travis-ci.org/facebook/facebook-php-sdk-v4)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/facebook/facebook-php-sdk-v4/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/facebook/facebook-php-sdk-v4/?branch=master)
-[![Latest Stable Version](http://img.shields.io/badge/Latest%20Stable-5.0.0-blue.svg)](https://packagist.org/packages/facebook/php-sdk-v4)
+We've released version 4 of the Facebook SDK for PHP here: [https://github.com/facebook/facebook-php-sdk-v4](https://github.com/facebook/facebook-php-sdk-v4)
+Please use the new repository for new projects and contributions.
+See the [Facebook Developers](https://developers.facebook.com/docs/php/) site
+ for documentation.
+
+-----
+
+-----
+
+-----
+
+-----
+
+Facebook PHP SDK (v.3.2.3) (DEPRECATED)
+
+The [Facebook Platform](http://developers.facebook.com/) is
+a set of APIs that make your app more social.
+
+This repository contains the open source PHP SDK that allows you to
+access Facebook Platform from your PHP app. Except as otherwise noted,
+the Facebook PHP SDK is licensed under the Apache Licence, Version 2.0
+(http://www.apache.org/licenses/LICENSE-2.0.html).
 
 
-This repository contains the open source PHP SDK that allows you to access the Facebook Platform from your PHP app.
+Usage
+-----
 
+The [examples][examples] are a good place to start. The minimal you'll need to
+have is:
+```php
+require 'facebook-php-sdk/src/facebook.php';
 
-## Installation
+$facebook = new Facebook(array(
+  'appId'  => 'YOUR_APP_ID',
+  'secret' => 'YOUR_APP_SECRET',
+));
 
-The Facebook PHP SDK can be installed with [Composer](https://getcomposer.org/). Add the Facebook PHP SDK package to your `composer.json` file.
+// Get User ID
+$user = $facebook->getUser();
+```
 
-```json
-{
-    "require": {
-        "facebook/php-sdk-v4": "~5.0"
-    }
+To make [API][API] calls:
+```php
+if ($user) {
+  try {
+    // Proceed knowing you have a logged in user who's authenticated.
+    $user_profile = $facebook->api('/me');
+  } catch (FacebookApiException $e) {
+    error_log($e);
+    $user = null;
+  }
 }
 ```
 
+You can make api calls by choosing the `HTTP method` and setting optional `parameters`:
+```php
+$facebook->api('/me/feed/', 'post', array(
+	'message' => 'I want to display this message on my wall'
+));
+```
 
-## Usage
 
-> **Note:** This version of the Facebook SDK for PHP requires PHP 5.4 or greater.
+Login or logout url will be needed depending on current user state.
+```php
+if ($user) {
+  $logoutUrl = $facebook->getLogoutUrl();
+} else {
+  $loginUrl = $facebook->getLoginUrl();
+}
+```
 
-Simple GET example of a user's profile.
+With Composer:
+
+- Add the `"facebook/php-sdk": "@stable"` into the `require` section of your `composer.json`.
+- Run `composer install`.
+- The example will look like
 
 ```php
-$fb = new Facebook\Facebook([
-  'app_id' => '{app-id}',
-  'app_secret' => '{app-secret}',
-  'default_graph_version' => 'v2.4',
-  //'default_access_token' => '{access-token}', // optional
-]);
-
-// Use one of the helper classes to get a Facebook\Authentication\AccessToken entity.
-//   $helper = $fb->getRedirectLoginHelper();
-//   $helper = $fb->getJavaScriptHelper();
-//   $helper = $fb->getCanvasHelper();
-//   $helper = $fb->getPageTabHelper();
-
-try {
-  // Get the Facebook\GraphNodes\GraphUser object for the current user.
-  // If you provided a 'default_access_token', the '{access-token}' is optional.
-  $response = $fb->get('/me', '{access-token}');
-} catch(Facebook\Exceptions\FacebookResponseException $e) {
-  // When Graph returns an error
-  echo 'Graph returned an error: ' . $e->getMessage();
-  exit;
-} catch(Facebook\Exceptions\FacebookSDKException $e) {
-  // When validation fails or other local issues
-  echo 'Facebook SDK returned an error: ' . $e->getMessage();
-  exit;
+if (($loader = require_once __DIR__ . '/vendor/autoload.php') == null)  {
+  die('Vendor directory not found, Please run composer install.');
 }
 
-$me = $response->getGraphUser();
-echo 'Logged in as ' . $me->getName();
+$facebook = new Facebook(array(
+  'appId'  => 'YOUR_APP_ID',
+  'secret' => 'YOUR_APP_SECRET',
+));
+
+// Get User ID
+$user = $facebook->getUser();
 ```
 
-Complete documentation, installation instructions, and examples are available at: [https://developers.facebook.com/docs/php](https://developers.facebook.com/docs/php)
+[examples]: /examples/example.php
+[API]: http://developers.facebook.com/docs/api
+
+Tests
+-----
+
+In order to keep us nimble and allow us to bring you new functionality, without
+compromising on stability, we have ensured full test coverage of the SDK.
+We are including this in the open source repository to assure you of our
+commitment to quality, but also with the hopes that you will contribute back to
+help keep it stable. The easiest way to do so is to file bugs and include a
+test case.
+
+The tests can be executed by using this command from the base directory:
+
+    phpunit --stderr --bootstrap tests/bootstrap.php tests/tests.php
 
 
-## Tests
+Contributing
+===========
+For us to accept contributions you will have to first have signed the
+[Contributor License Agreement](https://developers.facebook.com/opensource/cla).
 
-1. [Composer](https://getcomposer.org/) is a prerequisite for running the tests. Install composer globally, then run `composer install` to install required files.
-2. Create a test app on [Facebook Developers](https://developers.facebook.com), then create `tests/FacebookTestCredentials.php` from `tests/FacebookTestCredentials.php.dist` and edit it to add your credentials.
-3. The tests can be executed by running this command from the root directory:
+When commiting, keep all lines to less than 80 characters, and try to
+follow the existing style.
 
-```bash
-$ ./vendor/bin/phpunit
-```
+Before creating a pull request, squash your commits into a single commit.
 
-By default the tests will send live HTTP requests to the Graph API. If you are without an internet connection you can skip these tests by excluding the `integration` group.
-
-```bash
-$ ./vendor/bin/phpunit --exclude-group integration
-```
+Add the comments where needed, and provide ample explanation in the
+commit message.
 
 
-## Contributing
+Report Issues/Bugs
+===============
+[Bugs](https://developers.facebook.com/bugs)
 
-For us to accept contributions you will have to first have signed the [Contributor License Agreement](https://developers.facebook.com/opensource/cla). Please see [CONTRIBUTING](https://github.com/facebook/facebook-php-sdk-v4/blob/master/CONTRIBUTING.md) for details.
-
-
-## License
-
-Please see the [license file](https://github.com/facebook/facebook-php-sdk-v4/blob/master/LICENSE) for more information.
+[Questions](http://facebook.stackoverflow.com)
