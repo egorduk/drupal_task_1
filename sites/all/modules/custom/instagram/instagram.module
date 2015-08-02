@@ -1,17 +1,17 @@
 <?php
 
-function facebook_entity_info() {
+function instagram_entity_info() {
     $return = array(
-        'facebook' => array(
-            'label' => t('Facebook'),
-            'entity class' => 'Facebook1',
-            'controller class' => 'FacebookController',
-            'base table' => 'facebook',
+        'instagram' => array(
+            'label' => t('Instagram'),
+            'entity class' => 'Instagram',
+            'controller class' => 'InstagramController',
+            'base table' => 'instagram',
             'fieldable' => TRUE,
-            'load hook' => 'facebook_load',
-            'module' => 'facebook',
+            'load hook' => 'instagram_load',
+            'module' => 'instagram',
             'entity keys' => array(
-                'id' => 'fid',
+                'id' => 'iid',
                 'label' => ''
             ),
             'bundle keys' => array(
@@ -36,24 +36,24 @@ function facebook_entity_info() {
 }
 
 
-function facebook_menu() {
-    $items['admin/config/facebook'] = array(
+function instagram_menu() {
+    $items['admin/config/instagram'] = array(
         'title callback' => '',
         //'title arguments' => array('twitter', 1),
-        'page callback' => 'facebook_page_view',
+        'page callback' => 'instagram_page_view',
         //'page arguments' => array(1),
         //'access callback' => TRUE,
         'access arguments' => array('administer site configuration'),
-        'file' => 'facebook.pages.inc',
+        'file' => 'instagram.pages.inc',
     );
     return $items;
 }
 
-function facebook_load($twitter_id, $reset = FALSE) {
-    $products = facebook_load_multiple(array($twitter_id), array(), $reset);
+function instagram_load($twitter_id, $reset = FALSE) {
+    $products =instagram_load_multiple(array($twitter_id), array(), $reset);
     return $products ? reset($products) : FALSE;
 }
 
-function facebook_load_multiple($product_ids = array(), $conditions = array(), $reset = FALSE) {
-    return entity_load('facebook', $product_ids, $conditions, $reset);
+function instagram_load_multiple($product_ids = array(), $conditions = array(), $reset = FALSE) {
+    return entity_load('instagram', $product_ids, $conditions, $reset);
 }

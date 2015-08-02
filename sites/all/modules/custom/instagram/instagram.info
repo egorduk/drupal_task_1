@@ -1,0 +1,10 @@
+name = Instagram module
+description = Module for instagram
+package = «My»
+core = 7.x
+version = 7.x-1.0
+dependencies[] = entity
+dependencies[] = views
+files[] = Instagram.controller.inc
+stylesheets[all][] = style.css
+scripts[] = script.js

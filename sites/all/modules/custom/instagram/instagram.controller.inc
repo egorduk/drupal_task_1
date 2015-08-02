@@ -1,6 +1,6 @@
 <?php
 
-class FacebookController extends EntityAPIController {
+class InstagramController extends EntityAPIController {
     public function create(array $values = array()) {
         //$product_data = $values['product_data'];
         //$file = $values['file'];
@@ -13,12 +13,11 @@ class FacebookController extends EntityAPIController {
     }
 }
 
-class Facebook extends Entity {
+class Instagram extends Entity {
     protected function defaultLabel() {
         //return $this->name;
         return '';
     }
-
     protected function defaultUri() {
         return array('path' => 'twitter/' . $this->identifier());
     }
