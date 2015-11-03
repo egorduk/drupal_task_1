@@ -74,3 +74,144 @@ function main_user_register_form_submit($form, &$form_state){
     user_save(null, $newUser);
     drupal_set_message("Successful registration.");
 }
+
+function main_perm() {
+    return array(
+        'note resource create',
+        'note resource view any note',
+        'note resource view own notes',
+        'note resource edit any note',
+        'note resource edit own notes',
+        'note resource delete any note',
+        'note resource delete own notes',
+    );
+}
+
+function main_get_note($id) {
+    return (db_query("SELECT * FROM {note} WHERE id=:id", array(
+        ':id' => $id,
+    ))->fetchAssoc());
+}
+
+function main_write_note($note) {
+    $primary_key = !empty($note->id) ? array('id') : NULL;
+    drupal_write_record('note', $note, $primary_key);
+}
+
+function main_delete_note($id) {
+    db_query("DELETE FROM {note} WHERE id=:id", array(
+        ':id' => $id,
+    ));
+}
+
+function main_services_resources() {
+    return array(
+        'note' => array(
+            'retrieve' => array(
+                'help' => 'Retrieves a note',
+                'file' => array('file' => 'inc', 'module' => 'main'),
+                'callback' => '_main_retrieve',
+                //'access callback' => '_main_access',
+                //'access callback' => TRUE,
+                //'access arguments' => array('administer site configuration'),
+                //'access arguments' => array('view'),
+                //'access arguments' => TRUE,
+                //'access arguments append' => TRUE,
+                'args' => array(
+                    array(
+                        'name' => 'id',
+                        'type' => 'int',
+                        'description' => 'The id of the note to get',
+                        'source' => array('path' => '0'),
+                        'optional' => FALSE,
+                    ),
+                ),
+            ),
+            'create' => array(
+                'help' => 'Creates a note',
+                'file' => array('file' => 'inc', 'module' => 'source'),
+                'callback' => '_noteresource_create',
+                'access arguments' => array('note resource create'),
+                'access arguments append' => FALSE,
+                'args' => array(
+                    array(
+                        'name' => 'data',
+                        'type' => 'struct',
+                        'description' => 'The note object',
+                        'source' => 'data',
+                        'optional' => FALSE,
+                    ),
+                ),
+            ),
+            'update' => array(
+                'help' => 'Updates a note',
+                'file' => array('file' => 'inc', 'module' => 'source'),
+                'callback' => '_noteresource_update',
+                'access callback' => '_noteresource_access',
+                'access arguments' => array('update'),
+                'access arguments append' => TRUE,
+                'args' => array(
+                    array(
+                        'name' => 'id',
+                        'type' => 'int',
+                        'description' => 'The id of the node to update',
+                        'source' => array('path' => '0'),
+                        'optional' => FALSE,
+                    ),
+                    array(
+                        'name' => 'data',
+                        'type' => 'struct',
+                        'description' => 'The note data object',
+                        'source' => 'data',
+                        'optional' => FALSE,
+                    ),
+                ),
+            ),
+            'delete' => array(
+                'help' => 'Deletes a note',
+                'file' => array('file' => 'inc', 'module' => 'source'),
+                'callback' => '_noteresource_delete',
+                'access callback' => '_noteresource_access',
+                'access arguments' => array('delete'),
+                'access arguments append' => TRUE,
+                'args' => array(
+                    array(
+                        'name' => 'nid',
+                        'type' => 'int',
+                        'description' => 'The id of the note to delete',
+                        'source' => array('path' => '0'),
+                        'optional' => FALSE,
+                    ),
+                ),
+            ),
+            'index' => array(
+                'help' => 'Retrieves a listing of notes',
+                'file' => array('file' => 'inc', 'module' => 'main'),
+                'callback' => '_main_index',
+                'access callback' => '_main_access',
+                'access arguments' => array('access content'),
+                'access arguments append' => FALSE,
+                'args' => array(
+                    array(
+                        'name' => 'page',
+                        'type' => 'int',
+                        'description' => '',
+                        'source' => array(
+                            'param' => 'page',
+                        ),
+                        'optional' => TRUE,
+                        'default value' => 0,
+                    ),
+                    array(
+                        'name' => 'parameters',
+                        'type' => 'array',
+                        'description' => '',
+                        'source' => 'param',
+                        'optional' => TRUE,
+                        'default value' => array(),
+                    ),
+                ),
+            ),
+        ),
+    );
+}
