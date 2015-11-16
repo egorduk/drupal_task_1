@@ -66,3 +66,11 @@ function twitter_load($twitter_id, $reset = FALSE) {
 function twitter_load_multiple($product_ids = array(), $conditions = array(), $reset = FALSE) {
     return entity_load('twitter', $product_ids, $conditions, $reset);
 }
+
+function twitter_load_by_user() {
+    global $user;
+    $query = db_select('twitter', 'tw')
+        ->fields('tw', array('tid'))
+        ->condition('user_id', $user->uid);
+    return $query->execute()->fetchField();
+}

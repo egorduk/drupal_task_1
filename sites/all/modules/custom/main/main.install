@@ -52,6 +52,6 @@ function main_schema() {
             ),
           ),
           'primary key' => array('id'),
-        ),
+        )
       );
 }

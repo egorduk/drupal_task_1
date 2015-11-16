@@ -79,3 +79,15 @@ function _main_access($op, $args) {
     $access = TRUE;
     return $access;
 }
+
+function _main_get_socials() {
+    $arr = [];
+    $arr['twitter'] = getTwitterAccount();
+    $arr['facebook'] = true;
+    $arr['instagram'] = false;
+    return $arr;
+}
+
+function getTwitterAccount() {
+    return twitter_load_by_user();
+}

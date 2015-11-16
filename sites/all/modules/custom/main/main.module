@@ -8,7 +8,72 @@ function main_menu() {
         'access callback' => TRUE,
         'page arguments' => array('main_user_register_form'),
     );
+    $items['user/social/add'] = array(
+        'title' => 'Add social accounts',
+        'page callback' => 'social_add',
+        //'access arguments' => array('administer site configuration'),
+        'access callback' => TRUE,
+        'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+        'file' => 'social.pages.inc',
+    );
+    $items['user/test'] = array(
+        'title' => 'home page',
+        'page callback' => 'piy_page_callback',
+        'access callback' => TRUE,
+    );
     return $items;
+}
+
+function piy_page_callback() {
+    $module_path = drupal_get_path('module', 'main');
+    $content = array(
+        '#markup' => '',
+        '#attached' => array(
+            // include backbone (underscore is automatically added as a dependency)
+            //'libraries_load' => array(array('backbone')),
+            // include our custom js and settings
+            'js' => array(
+                array('data' => $module_path . '/js/underscore.js', 'type' => 'file', 'scope' => 'footer'),
+                array('data' => $module_path . '/js/backbone.js', 'type' => 'file', 'scope' => 'footer'),
+                array('data' => $module_path . '/js/app.js', 'type' => 'file', 'scope' => 'footer'),
+            ),
+            /*'css' => array(
+                array('data' => $module_path . '/path/to/mybackboneapp.css', 'type' => 'file'),
+            ),*/
+        ),
+    );
+    $content['#markup'] = '
+  <div id="mybackboneapp"></div>
+  <script type="text/template" id="nodeView">
+    <li><%=title%></li>
+  </script>
+  ';
+    return $content;
+}
+
+function main_settings_libraries_info() {
+    $module_path = drupal_get_path('module', 'main');
+    $libraries['underscore'] = array(
+        'name' => 'underscore.js',
+        'files' => array(
+            'js' => array(
+                //$module_path . '/js/underscore.js',
+                'underscore.js',
+            ),
+        ),
+    );
+    $libraries['backbone'] = array(
+        'name' => 'backbone.js',
+        'files' => array(
+            'js' => array(
+                'backbone.js',
+            ),
+        ),
+        'dependencies' => array(
+            'underscore',
+        ),
+    );
+    return $libraries;
 }
 
 function main_user_register_form($form, &$form_state) {
@@ -213,5 +278,128 @@ function main_services_resources() {
                 ),
             ),
         ),
+        'social' => array(
+            'actions' => array(
+                'get_socials' => array(
+                    'help' => 'Retrieves a listing of notes',
+                    'file' => array('file' => 'inc', 'module' => 'main'),
+                    'callback' => '_main_get_socials',
+                    //'access callback' => '_main_access',
+                    //'access callback' => TRUE,
+                    'access arguments' => array('administer site configuration'),
+                    //'access arguments' => array('view'),
+                    //'access arguments' => TRUE,
+                    //'access arguments append' => TRUE,
+                    //'args' => array(),
+                )
+            ),
+            'retrieve' => array(
+                'help' => 'Retrieves a note',
+                'file' => array('file' => 'inc', 'module' => 'main'),
+                'callback' => '_main_retrieve',
+                //'access callback' => '_main_access',
+                //'access callback' => TRUE,
+                //'access arguments' => array('administer site configuration'),
+                //'access arguments' => array('view'),
+                //'access arguments' => TRUE,
+                //'access arguments append' => TRUE,
+                'args' => array(
+                    array(
+                        'name' => 'id',
+                        'type' => 'int',
+                        'description' => 'The id of the note to get',
+                        'source' => array('path' => '0'),
+                        'optional' => FALSE,
+                    ),
+                ),
+            ),
+            'create' => array(
+                'help' => 'Creates a note',
+                'file' => array('file' => 'inc', 'module' => 'source'),
+                'callback' => '_noteresource_create',
+                'access arguments' => array('note resource create'),
+                'access arguments append' => FALSE,
+                'args' => array(
+                    array(
+                        'name' => 'data',
+                        'type' => 'struct',
+                        'description' => 'The note object',
+                        'source' => 'data',
+                        'optional' => FALSE,
+                    ),
+                ),
+            ),
+            'update' => array(
+                'help' => 'Updates a note',
+                'file' => array('file' => 'inc', 'module' => 'source'),
+                'callback' => '_noteresource_update',
+                'access callback' => '_noteresource_access',
+                'access arguments' => array('update'),
+                'access arguments append' => TRUE,
+                'args' => array(
+                    array(
+                        'name' => 'id',
+                        'type' => 'int',
+                        'description' => 'The id of the node to update',
+                        'source' => array('path' => '0'),
+                        'optional' => FALSE,
+                    ),
+                    array(
+                        'name' => 'data',
+                        'type' => 'struct',
+                        'description' => 'The note data object',
+                        'source' => 'data',
+                        'optional' => FALSE,
+                    ),
+                ),
+            ),
+            'delete' => array(
+                'help' => 'Deletes a note',
+                'file' => array('file' => 'inc', 'module' => 'source'),
+                'callback' => '_noteresource_delete',
+                'access callback' => '_noteresource_access',
+                'access arguments' => array('delete'),
+                'access arguments append' => TRUE,
+                'args' => array(
+                    array(
+                        'name' => 'nid',
+                        'type' => 'int',
+                        'description' => 'The id of the note to delete',
+                        'source' => array('path' => '0'),
+                        'optional' => FALSE,
+                    ),
+                ),
+            ),
+            'index' => array(
+                'help' => 'Retrieves a listing of notes',
+                'file' => array('file' => 'inc', 'module' => 'main'),
+                'callback' => '_main_get_socials',
+                'access callback' => '_main_access',
+                'access arguments' => array('access content'),
+                'access arguments append' => FALSE,
+                'args' => array()
+            )
+        )
     );
+}
+
+function getSocials() {
+    //var_dump(getTwitterAccount());die;
+    $arr = [];
+    $arr['twitter'] = getTwitterAccount();
+    $arr['facebook'] = true;
+    $arr['instagram'] = false;
+    return $arr;
+}
+
+function getFacebookAccount() {
+
+}
+
+/*function getTwitterAccount() {
+    return twitter_load_by_user();
+}*/
+
+function getInstagramAccount() {
+
 }
