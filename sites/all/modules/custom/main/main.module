@@ -279,8 +279,16 @@ function main_services_resources() {
             ),
         ),
         'social' => array(
-            'actions' => array(
+            'relationships' => array(
                 'get_socials' => array(
+                    'help' => 'Retrieves a listing of notes',
+                    'file' => array('file' => 'inc', 'module' => 'main'),
+                    'callback' => '_main_get_socials',
+                    'access arguments' => array('administer site configuration'),
+                )
+            ),
+            'actions' => array(
+                'get_socials1' => array(
                     'help' => 'Retrieves a listing of notes',
                     'file' => array('file' => 'inc', 'module' => 'main'),
                     'callback' => '_main_get_socials',
