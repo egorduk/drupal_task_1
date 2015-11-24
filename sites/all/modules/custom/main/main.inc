@@ -80,12 +80,17 @@ function _main_access($op, $args) {
     return $access;
 }
 
-function _main_get_socials() {
-    $arr = [];
-    $arr['twitter'] = getTwitterAccount();
-    $arr['facebook'] = true;
-    $arr['instagram'] = false;
-    return $arr;
+function _main_get_socials($mode) {
+    if ($mode == 'get_socials') {
+        $arr = [];
+        //$arr['twitter'] = getTwitterAccount();
+        //$arr['facebook'] = true;
+        //$arr['instagram'] = false;
+        $arr[] = array('title' => 'response1', 'authorLast' => 'Harrison', 'authorFirst' => 'Jim');
+        //$arr[] = array('title' => 'response2', 'authorLast' => 'Snyder', 'authorFirst' => 'Gary');
+        return ($arr);
+    }
+    return 'Error';
 }
 
 function getTwitterAccount() {

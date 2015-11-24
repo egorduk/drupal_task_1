@@ -33,8 +33,10 @@ function piy_page_callback() {
             //'libraries_load' => array(array('backbone')),
             // include our custom js and settings
             'js' => array(
+                array('data' => $module_path . '/js/jquery.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/underscore.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/backbone.js', 'type' => 'file', 'scope' => 'footer'),
+                array('data' => $module_path . '/js/backbone.marionette.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/app.js', 'type' => 'file', 'scope' => 'footer'),
             ),
             /*'css' => array(
@@ -42,12 +44,17 @@ function piy_page_callback() {
             ),*/
         ),
     );
+    //$layout = "http://localhost/drupal_task_1/" . $module_path . "/layout.tpl";
+    //$item = "http://localhost/drupal_task_1/" . $module_path . "/item.tpl";
     $content['#markup'] = '
-  <div id="mybackboneapp"></div>
-  <script type="text/template" id="nodeView">
-    <li><%=title%></li>
-  </script>
-  ';
+ <div id="content"></div>
+<script type="text/template" id="layout-template">
+<h1>Main Template</h1>
+<div id="regionOne"></div>
+</script>
+<script type="text/template" id="item-template">
+
+</script>';
     return $content;
 }
 
@@ -279,7 +286,7 @@ function main_services_resources() {
             ),
         ),
         'social' => array(
-            'relationships' => array(
+            /*'relationships' => array(
                 'get_socials' => array(
                     'help' => 'Retrieves a listing of notes',
                     'file' => array('file' => 'inc', 'module' => 'main'),
@@ -292,100 +299,24 @@ function main_services_resources() {
                     'help' => 'Retrieves a listing of notes',
                     'file' => array('file' => 'inc', 'module' => 'main'),
                     'callback' => '_main_get_socials',
-                    //'access callback' => '_main_access',
-                    //'access callback' => TRUE,
                     'access arguments' => array('administer site configuration'),
-                    //'access arguments' => array('view'),
-                    //'access arguments' => TRUE,
-                    //'access arguments append' => TRUE,
-                    //'args' => array(),
                 )
-            ),
-            'retrieve' => array(
-                'help' => 'Retrieves a note',
-                'file' => array('file' => 'inc', 'module' => 'main'),
-                'callback' => '_main_retrieve',
-                //'access callback' => '_main_access',
-                //'access callback' => TRUE,
-                //'access arguments' => array('administer site configuration'),
-                //'access arguments' => array('view'),
-                //'access arguments' => TRUE,
-                //'access arguments append' => TRUE,
-                'args' => array(
-                    array(
-                        'name' => 'id',
-                        'type' => 'int',
-                        'description' => 'The id of the note to get',
-                        'source' => array('path' => '0'),
-                        'optional' => FALSE,
-                    ),
-                ),
-            ),
-            'create' => array(
-                'help' => 'Creates a note',
-                'file' => array('file' => 'inc', 'module' => 'source'),
-                'callback' => '_noteresource_create',
-                'access arguments' => array('note resource create'),
-                'access arguments append' => FALSE,
-                'args' => array(
-                    array(
-                        'name' => 'data',
-                        'type' => 'struct',
-                        'description' => 'The note object',
-                        'source' => 'data',
-                        'optional' => FALSE,
-                    ),
-                ),
-            ),
-            'update' => array(
-                'help' => 'Updates a note',
-                'file' => array('file' => 'inc', 'module' => 'source'),
-                'callback' => '_noteresource_update',
-                'access callback' => '_noteresource_access',
-                'access arguments' => array('update'),
-                'access arguments append' => TRUE,
-                'args' => array(
-                    array(
-                        'name' => 'id',
-                        'type' => 'int',
-                        'description' => 'The id of the node to update',
-                        'source' => array('path' => '0'),
-                        'optional' => FALSE,
-                    ),
-                    array(
-                        'name' => 'data',
-                        'type' => 'struct',
-                        'description' => 'The note data object',
-                        'source' => 'data',
-                        'optional' => FALSE,
-                    ),
-                ),
-            ),
-            'delete' => array(
-                'help' => 'Deletes a note',
-                'file' => array('file' => 'inc', 'module' => 'source'),
-                'callback' => '_noteresource_delete',
-                'access callback' => '_noteresource_access',
-                'access arguments' => array('delete'),
-                'access arguments append' => TRUE,
-                'args' => array(
-                    array(
-                        'name' => 'nid',
-                        'type' => 'int',
-                        'description' => 'The id of the note to delete',
-                        'source' => array('path' => '0'),
-                        'optional' => FALSE,
-                    ),
-                ),
-            ),
+            ),*/
             'index' => array(
                 'help' => 'Retrieves a listing of notes',
                 'file' => array('file' => 'inc', 'module' => 'main'),
                 'callback' => '_main_get_socials',
-                'access callback' => '_main_access',
-                'access arguments' => array('access content'),
-                'access arguments append' => FALSE,
-                'args' => array()
+                'access arguments' => array('administer site configuration'),
+                //'args' => array()
+                'args' => array(
+                    array(
+                        'name' => 'mode',
+                        'type' => 'string',
+                        'description' => '',
+                        'source' => array('path' => '0'),
+                        'optional' => FALSE,
+                    ),
+                ),
             )
         )
     );
