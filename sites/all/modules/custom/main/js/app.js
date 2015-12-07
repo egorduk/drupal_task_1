@@ -1,4 +1,5 @@
 /* create a new instance of the Marionette app */
+
 var app = new Backbone.Marionette.Application();
 /* add the initial region which will contain the app */
 app.addRegions({

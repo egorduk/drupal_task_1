@@ -18,6 +18,7 @@ var myBackboneApp = myBackboneApp || {};
         }
     });
 
+
     var a = new myBackboneApp.NodeCollection().fetch();
 // App View
 // --------

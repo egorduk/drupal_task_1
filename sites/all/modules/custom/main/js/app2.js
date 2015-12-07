@@ -16,6 +16,7 @@ AngryCatView = Backbone.Marionette.ItemView.extend({
     className: 'angry_cat'
 });
 
+
 AngryCatsView = Backbone.Marionette.CompositeView.extend({
     tagName: "table",
     id: "angry_cats",
