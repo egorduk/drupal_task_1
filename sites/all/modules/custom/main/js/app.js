@@ -125,9 +125,7 @@ app.module('App', function(module, App, Backbone, Marionette, $, _){
             accounts.url = '/drupal_task_1/notes/social/get_socials.json';
             accounts.fetch();
             console.log(accounts);*/
-
             //console.log(a);
-
         },
         /* called when the view displays in the UI */
         onShow: function() {
