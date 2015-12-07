@@ -78,6 +78,7 @@ function _main_access($op, $args) {
     }*/
     $access = TRUE;
     return $access;
+
 }
 
 function _main_get_socials($mode) {

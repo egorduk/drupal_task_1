@@ -39,6 +39,7 @@ function piy_page_callback() {
                 array('data' => $module_path . '/js/backbone.marionette.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/app.js', 'type' => 'file', 'scope' => 'footer'),
             ),
+
             /*'css' => array(
                 array('data' => $module_path . '/path/to/mybackboneapp.css', 'type' => 'file'),
             ),*/
