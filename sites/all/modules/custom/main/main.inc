@@ -88,7 +88,7 @@ function _main_get_socials($mode) {
         //$arr['facebook'] = true;
         //$arr['instagram'] = false;
         $arr[] = array('title' => 'response1', 'authorLast' => 'Harrison', 'authorFirst' => 'Jim');
-        //$arr[] = array('title' => 'response2', 'authorLast' => 'Snyder', 'authorFirst' => 'Gary');
+        $arr[] = array('title' => 'response2', 'authorLast' => 'Snyder', 'authorFirst' => 'Gary');
         return ($arr);
     }
     return 'Error';
