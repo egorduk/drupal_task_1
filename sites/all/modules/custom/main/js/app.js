@@ -8,7 +8,7 @@ app.addRegions({
 });
 /* define a module to keep the code modular */
 app.module('App', function(module, App, Backbone, Marionette, $, _){
-    var bookCollection;
+    var socialCollection;
     /*Backbone.sync = function(method, model) {
         console.log(method + ": " + model.url);
     };*/
@@ -22,7 +22,7 @@ app.module('App', function(module, App, Backbone, Marionette, $, _){
         url: '/drupal_task_1/notes/social/get_socials.json'
     });
     /* definition for book collection */
-    module.BookCollection = Backbone.Collection.extend({
+    module.socialCollection = Backbone.Collection.extend({
         /* set model type used for this collection */
         model: module.BookModel,
         /* comparator determines how collection is sorted */
@@ -42,19 +42,21 @@ app.module('App', function(module, App, Backbone, Marionette, $, _){
     module.SocialCollection = Backbone.Collection.extend({
         model: module.SocialModel
     });
-    module.BookItemView = Marionette.ItemView.extend({
-        tagName: 'li',
+    module.socialItemView = Marionette.ItemView.extend({
+        tagName: 'tr',
         template: '#item-template',
-        initialize: function(){ console.log('BookItemView: initialize >>> ' + this.model.get('title')) },
-        onRender: function(){ console.log('BookItemView: onRender >>> ' + this.model.get('title')) },
-        onShow: function(){ console.log('BookItemView: onShow >>> ' + this.model.get('title')) }
+        initialize: function(){ console.log('socialItemView: initialize >>> ' + this.model.get('title')) },
+        onRender: function(){ console.log('socialItemView: onRender >>> ' + this.model.get('title')) },
+        onShow: function(){ console.log('socialItemView: onShow >>> ' + this.model.get('title')) }
     });
-    module.BookCollectionView = Marionette.CollectionView.extend({
-        tagName: 'ul',
-        childView: module.BookItemView,
-        initialize: function(){ console.log('BookCollectionView: initialize') },
-        onRender: function(){ console.log('BookCollectionView: onRender') },
-        onShow: function(){ console.log('BookCollectionView: onShow') }
+    module.socialCollectionView = Marionette.CollectionView.extend({
+        tagName: 'table',
+        childView: module.socialItemView,
+        //childViewContainer: "tbody",
+        //template: '#layout-template',
+        initialize: function(){ console.log('socialCollectionView: initialize') },
+        onRender: function(){ console.log('socialCollectionView: onRender') },
+        onShow: function(){ console.log('socialCollectionView: onShow') }
     });
     /* define a view; in this case a 'LayoutView' (formerly 'Layout') */
     module.AppLayoutView = Marionette.LayoutView.extend({
@@ -77,9 +79,9 @@ app.module('App', function(module, App, Backbone, Marionette, $, _){
          into which to be rendered. */
         onRender: function() {
             console.log('main layout: onRender');
-            console.log('data = ' + bookCollection);
-            var bookCollectionView = new module.BookCollectionView({collection: bookCollection});
-            this.RegionOne.show(bookCollectionView);
+           // console.log('data = ' + socialCollection);
+            var socialCollectionView = new module.socialCollectionView({collection: socialCollection});
+            this.RegionOne.show(socialCollectionView);
         },
         /* called when the view displays in the UI */
         onShow: function() {
@@ -88,8 +90,8 @@ app.module('App', function(module, App, Backbone, Marionette, $, _){
     });
     /* Tell the module what to do when it is done loading */
     module.addInitializer(function(){
-        bookCollection = new module.BookCollection();
-        bookCollection.fetch({}).fail(function() {}).done(function(a) {
+        socialCollection = new module.socialCollection();
+        socialCollection.fetch({}).fail(function() {}).done(function(a) {
             console.log(a);
             /* create a new instance of the layout from the module */
             var layout = new module.AppLayoutView();

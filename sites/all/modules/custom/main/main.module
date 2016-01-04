@@ -49,13 +49,12 @@ function piy_page_callback() {
     $content['#markup'] = '
  <div id="content"></div>
 <script type="text/template" id="layout-template">
-<h1>Main Template</h1>
-<div id="regionOne"></div>
+    <h1>Main Template</h1>
+    <div id="regionOne"></div>
 </script>
 <script type="text/template" id="item-template">
-    <li><%=title%></li>
-    <li><%=authorLast%></li>
-    <li><%=authorFirst%></li>
+    <td><%=name%></td>
+    <td><%=status%></td>
 </script>';
     return $content;
 }
