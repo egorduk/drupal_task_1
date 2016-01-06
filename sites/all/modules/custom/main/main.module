@@ -47,15 +47,36 @@ function piy_page_callback() {
     //$layout = "http://localhost/drupal_task_1/" . $module_path . "/layout.tpl";
     //$item = "http://localhost/drupal_task_1/" . $module_path . "/item.tpl";
     $content['#markup'] = '
+<!-- <div id="menu"></div>-->
  <div id="content"></div>
 <script type="text/template" id="layout-template">
-    <h1>Main Template</h1>
+  <!--  <h1>Main Template</h1>-->
     <div id="regionOne"></div>
+   <!-- <thead>
+        <tr>
+            <th>Social name</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody></tbody>-->
+    <div id="Navigation">
+        <a id="nav-home" class="navButton" href="#home">Home</a> : : :
+        <a id="nav-info" class="navButton" href="#info">Information</a>
+    </div>
 </script>
 <script type="text/template" id="item-template">
     <td><%=name%></td>
     <td><%=status%></td>
-</script>';
+</script>
+<script type="text/template" id="template-HomeLayoutView">
+    <h2>Home</h2>
+    <p>This is the home view</p>
+</script>
+<script type="text/template" id="template-InfoLayoutView">
+    <h2>Information</h2>
+    <p>This is a page of information</p>
+</script>
+';
     return $content;
 }
 
