@@ -38,6 +38,17 @@ function piy_page_callback() {
                 array('data' => $module_path . '/js/backbone.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/backbone.marionette.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/app.js', 'type' => 'file', 'scope' => 'footer'),
+                array('data' => $module_path . '/js/app_second.js', 'type' => 'file', 'scope' => 'footer'),
+                array('data' => $module_path . '/js/app_third.js', 'type' => 'file', 'scope' => 'footer'),
+                array('data' => $module_path . '/js/app_routing.js', 'type' => 'file', 'scope' => 'footer'),
+                array('data' => $module_path . '/js/app_closer.js', 'type' => 'file', 'scope' => 'footer'),
+                array('data' => $module_path . '/js/app_start.js', 'type' => 'file', 'scope' => 'footer')
+        /*        array('data' => $module_path . '/javascript/app.js', 'type' => 'file', 'scope' => 'footer'),
+                array('data' => $module_path . '/javascript/app.library_app.js', 'type' => 'file', 'scope' => 'footer'),
+                array('data' => $module_path . '/javascript/app.library_app.book_list.js', 'type' => 'file', 'scope' => 'footer'),
+                array('data' => $module_path . '/javascript/app.library_app.routing.js', 'type' => 'file', 'scope' => 'footer'),
+                array('data' => $module_path . '/javascript/app.closer.js', 'type' => 'file', 'scope' => 'footer'),
+                array('data' => $module_path . '/javascript/app_start.js', 'type' => 'file', 'scope' => 'footer')*/
             ),
             /*'css' => array(
                 array('data' => $module_path . '/path/to/mybackboneapp.css', 'type' => 'file'),
@@ -47,10 +58,8 @@ function piy_page_callback() {
     //$layout = "http://localhost/drupal_task_1/" . $module_path . "/layout.tpl";
     //$item = "http://localhost/drupal_task_1/" . $module_path . "/item.tpl";
     $content['#markup'] = '
-<!-- <div id="menu"></div>-->
- <div id="content"></div>
-<script type="text/template" id="layout-template">
-  <!--  <h1>Main Template</h1>-->
+<!--<script type="text/template" id="layout-template">
+   <h1>Main Template</h1>
     <div id="regionOne"></div>
    <!-- <thead>
         <tr>
@@ -59,12 +68,45 @@ function piy_page_callback() {
         </tr>
     </thead>
     <tbody></tbody>-->
-    <div id="Navigation">
+   <!-- <div id="Navigation">
         <a id="nav-home" class="navButton" href="#home">Home</a> : : :
         <a id="nav-info" class="navButton" href="#info">Information</a>
     </div>
+</script>-->
+
+<div id="menu">
+    <a href="#main" class="js-menu-main">Main</a>
+    <a href="#feeds" class="js-menu-feeds">Feeds</a>
+    <a href="#exit" class="js-menu-exit">Exit</a>
+</div>
+<div id="content1"></div>
+<div id="modal"></div>
+<script type="text/template" id="layout-template">
+    <div id="searchBar">
+        Search : <input type="text" name="search" autocomplete="off" id="searchTerm" value="" />
+        <img src="" alt="Loading..." id="spinner" />
+    </div>
+    <div id="bookContainer"></div>
 </script>
-<script type="text/template" id="item-template">
+<script type="text/template" id="book-list-template">
+   <div style="display:table;width:100%;height:100%;">
+      <div class="leftBar"></div>
+      <div class="books"></div>
+      <div class="rightBar"></div>
+    </div>
+  </script>
+  <script type="text/template" id="book-template">
+    <img src="" alt="" class="book" />
+  </script>
+  <script type="text/template" id="book-detail-template">
+    <a class="close" data-dismiss="modal">x</a>
+  </script>
+  <script type="text/template" id="close-template">
+    <p>That\'s all, folks !</p>
+  </script>
+
+
+<!--<script type="text/template" id="item-template">
     <td><%=name%></td>
     <td><%=status%></td>
 </script>
@@ -75,7 +117,7 @@ function piy_page_callback() {
 <script type="text/template" id="template-InfoLayoutView">
     <h2>Information</h2>
     <p>This is a page of information</p>
-</script>
+</script>-->
 ';
     return $content;
 }
