@@ -11,7 +11,7 @@ app.Closer.Router = Backbone.Marionette.AppRouter.extend({
 app.Closer.close = function(){
     var closeView = new app.Closer.DefaultView();
     app.contentRegion.show(closeView);
-    Backbone.history.navigate("close");
+    Backbone.history.navigate("feeds");
 };
 app.addInitializer(function(){
     app.Closer.router = new app.Closer.Router({

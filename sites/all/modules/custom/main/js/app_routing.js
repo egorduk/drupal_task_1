@@ -2,8 +2,11 @@ app.AppRouting = function(){
     var AppRouting = {};
     AppRouting.Router = Backbone.Marionette.AppRouter.extend({
         appRoutes: {
-            "": "defaultSearch",
-            "search/:searchTerm": "search"
+            "": "home",
+            "search/:searchTerm": "search",
+            "view/:socialName" : "viewSocial",
+            "reset/:socialName" : "resetSocial",
+            "sync/:socialName" : "syncSocial"
         }
     });
     app.vent.on("search:term", function(searchTerm){

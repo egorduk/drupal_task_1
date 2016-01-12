@@ -1,26 +1,41 @@
-app.LibraryApp.SocialList = function(){
-    var BookList = {};
+app.SocialList = function(){
+    var SocialList = {};
     var BookDetailView = Backbone.Marionette.ItemView.extend({
         template: "#book-detail-template",
         className: "modal bookDetail"
     });
-    var BookView = Backbone.Marionette.ItemView.extend({
-        template: "#book-template",
+    var SocialRowView = Backbone.Marionette.ItemView.extend({
+        template: "#item-template",
+        tagName: "tr",
         events: {
-            'click': 'showBookDetail'
+            //'click': 'showBookDetail'
         },
         showBookDetail: function(){
             var detailView = new BookDetailView({model: this.model});
             app.modal.show(detailView);
+        },
+        onRender: function() {
+            var statusCell = this.$el.find("td").eq(1);
+            var socialName = this.model.get("name");
+            var socialStatus = this.model.get("status");
+            //var authLink = app.ConfigApp.getSocialAuthLink(socialName);
+            (socialStatus) ?
+                statusCell.html('<span class="status-true"></span>' +
+                    '<a href="#view/' + socialName + '">View</a> | ' +
+                    '<a href="#reset/' + socialName + '">Reset</a>') :
+                statusCell.html('<span class="status-false"></span><a href="#sync/' + socialName + '">Sync</a>');
+            console.log('GridRow: onRender');
         }
     });
-    var BookListView = Backbone.Marionette.CompositeView.extend({
-        template: "#book-list-template",
-        id: "bookList",
-        itemView: BookView,
+    var SocialListView = Backbone.Marionette.CompositeView.extend({
+        tagName: "table",
+        template: "#list-template",
+        //class: "bookList",
+        childView: SocialRowView,
+        //itemView: SocialViewRow,
         initialize: function(){
-            _.bindAll(this, "showMessage", "loadMoreBooks");
-            var self = this;
+            //_.bindAll(this, "showMessage", "loadMoreBooks");
+            /*var self = this;
             app.vent.on("search:error", function(){
                 self.showMessage("Error, please retry later :s")
             });
@@ -29,14 +44,12 @@ app.LibraryApp.SocialList = function(){
             });
             app.vent.on("search:noResults", function(){
                 self.showMessage("No books found")
-            });
+            });*/
         },
-        events: {
-            'scroll': 'loadMoreBooks'
-        },
-        appendHtml: function(collectionView, itemView){
+       /* appendHtml: function(collectionView, itemView){
+            console.log(itemView.el);
             collectionView.$(".books").append(itemView.el);
-        },
+        },*/
         showMessage: function(message){
             this.$('.books').html('<h1 class="notFound">' + message + '</h1>');
         },
@@ -73,14 +86,14 @@ app.LibraryApp.SocialList = function(){
             }
         }
     });
-    BookList.showBooks = function(books){
-        var bookListView = new BookListView({ collection: books });
-        app.LibraryApp.layout.books.show(bookListView);
+    SocialList.showBooks = function(socials){
+        var socialListView = new SocialListView({ collection: socials });
+        app.LibraryApp.layout.mainContainer.show(socialListView);
     };
     app.vent.on("layout:rendered", function(){
         // render a view for the existing HTML in the template, and attach it to the layout (i.e. don't double render)
         var searchView = new SearchView();
         app.LibraryApp.layout.search.attachView(searchView);
     });
-    return BookList;
+    return SocialList;
 }();

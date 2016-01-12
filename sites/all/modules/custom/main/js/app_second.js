@@ -4,7 +4,7 @@ app.LibraryApp = function(){
         template: "#layout-template",
         regions: {
             search: "#searchBar",
-            books: "#bookContainer"
+            mainContainer: "#mainContainer"
         }
     });
     var SocialModel = Backbone.Model.extend({
@@ -21,11 +21,11 @@ app.LibraryApp = function(){
                 self.fetchSocials();
             });
         },
-        fetchSocials: function(callback) {
+        fetchSocials: function() {
             this.fetch({}).fail(function(){}).done(function(a) {
                 console.log(a);
-                callback(a);
-                return a;
+                //callback(a);
+                //return a;
             });
         }
     });
@@ -111,7 +111,7 @@ app.LibraryApp = function(){
             });
         }
     });
-    LibraryApp.Books = new Books();
+    //LibraryApp.Books = new Books();
     LibraryApp.SocialCollection = new SocialCollection();
     LibraryApp.initializeLayout = function(){
         LibraryApp.layout = new Layout();
@@ -120,17 +120,31 @@ app.LibraryApp = function(){
         });
         app.contentRegion.show(app.LibraryApp.layout);
     };
-    LibraryApp.search = function(term){
+    //LibraryApp.search = function(term){
+    LibraryApp.search = function(){
         //alert("search");
         LibraryApp.initializeLayout();
         //app.LibraryApp.BookList.showBooks(LibraryApp.Books);
-        app.LibraryApp.SocialList.showBooks(LibraryApp.SocialCollection);
+        app.SocialList.showBooks(LibraryApp.SocialCollection);
         //app.vent.trigger("search:term", term);
         app.vent.trigger("search:test");
+        console.log(LibraryApp.SocialCollection);
     };
-    LibraryApp.defaultSearch = function(){
+    LibraryApp.home = function(){
         //alert('main');
-        this.search(LibraryApp.Books.previousSearch || "Neuromarketing");
+        //this.search(LibraryApp.Books.previousSearch || "Neuromarketing");
+        this.search();
+    };
+    LibraryApp.viewSocial = function(socialName){
+        console.log("view " + socialName);
+    };
+    LibraryApp.resetSocial = function(socialName){
+        console.log("reset " + socialName);
+    };
+    LibraryApp.syncSocial = function(socialName){
+        console.log("sync " + socialName);
+        var authLink = app.ConfigApp.getSocialAuthLink(socialName);
+        console.log(authLink);
     };
     return LibraryApp;
 }();

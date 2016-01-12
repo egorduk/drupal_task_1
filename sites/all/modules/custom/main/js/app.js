@@ -24,7 +24,7 @@ var ModalRegion = Backbone.Marionette.Region.extend({
 app.addRegions({
     menuRegion: '#menu',
     contentRegion: '#content1',
-    modal: ModalRegion
+    //modal: ModalRegion
 });
 app.MenuView = Backbone.Marionette.View.extend({
     el: "#menu",
@@ -142,48 +142,6 @@ app.vent.on("routing:started", function(){
 //        onShow: function() {
 //            console.log('Main layout: onShow');
 //        },
-//        initRouter: function() {
-//            var capturedThis = this;
-//            // assign route handlers to specific routes.
-//            // In this case, 'home' is triggered when the browser visits index.html#home. Likewise index.html#info.
-//            // the empty set is for an address with no hash.
-//            var appRouteHandler = {
-//                '' : 'onHomeRoute',
-//                'home' : 'onHomeRoute',
-//                'info' : 'onInfoRoute'
-//            };
-//            // controller which contains the methods which are used as route handlers. These are referenced in the appRoutes object above.
-//            var appRouterController = {
-//                onHomeRoute: function() {
-//                    capturedThis.onHomeNavigated();
-//                },
-//                onInfoRoute: function() {
-//                    capturedThis.onInfoNavigated();
-//                }
-//            };
-//            // define an AppRouter constructor
-//            var router = Marionette.AppRouter.extend({});
-//            // create a new instance of the AppRouter and assign the routes and controller
-//            var appRouter = new router({
-//                appRoutes: appRouteHandler,
-//                controller: appRouterController
-//            });
-//        },
-//        /* called when the router sees that we have met the criteria to trigger the 'onHomeRoute' handler */
-//        onHomeNavigated: function() {
-//            // define and display an instance of the HomeLayoutView
-//            var homeLayoutView = new module.HomeLayoutView();
-//            app.appRegion.show(homeLayoutView);
-//            // update the navigation
-//            this.$el.find('.navButton.active').removeClass('active');
-//            this.ui.navHome.addClass('active');
-//        },
-//        onInfoNavigated: function() {
-//            var infoLayoutView = new module.InfoLayoutView();
-//            app.appRegion.show(infoLayoutView);
-//            this.$el.find('.navButton.active').removeClass('active');
-//            this.ui.navInfo.addClass('active');
-//        }
 //    });
 //
 //    var GridRow = Backbone.Marionette.ItemView.extend({
@@ -227,48 +185,6 @@ app.vent.on("routing:started", function(){
 //            console.log(itemView);
 //            collectionView.$("tbody").append(itemView.el);
 //        }*/
-//        initRouter: function() {
-//            var capturedThis = this;
-//            // assign route handlers to specific routes.
-//            // In this case, 'home' is triggered when the browser visits index.html#home. Likewise index.html#info.
-//            // the empty set is for an address with no hash.
-//            var appRouteHandler = {
-//                '' : 'onHomeRoute',
-//                'home' : 'onHomeRoute',
-//                'info' : 'onInfoRoute'
-//            };
-//            // controller which contains the methods which are used as route handlers. These are referenced in the appRoutes object above.
-//            var appRouterController = {
-//                onHomeRoute: function() {
-//                    capturedThis.onHomeNavigated();
-//                },
-//                onInfoRoute: function() {
-//                    capturedThis.onInfoNavigated();
-//                }
-//            };
-//            // define an AppRouter constructor
-//            var router = Marionette.AppRouter.extend({});
-//            // create a new instance of the AppRouter and assign the routes and controller
-//            var appRouter = new router({
-//                appRoutes: appRouteHandler,
-//                controller: appRouterController
-//            });
-//        },
-//        /* called when the router sees that we have met the criteria to trigger the 'onHomeRoute' handler */
-//        onHomeNavigated: function() {
-//            // define and display an instance of the HomeLayoutView
-//            var homeLayoutView = new module.HomeLayoutView();
-//            app.appRegion.show(homeLayoutView);
-//            // update the navigation
-//            this.$el.find('.navButton.active').removeClass('active');
-//            this.ui.navHome.addClass('active');
-//        },
-//        onInfoNavigated: function() {
-//            var infoLayoutView = new module.InfoLayoutView();
-//            app.appRegion.show(infoLayoutView);
-//            this.$el.find('.navButton.active').removeClass('active');
-//            this.ui.navInfo.addClass('active');
-//        }
 //    });
 //
 //    module.HomeLayoutView = Marionette.LayoutView.extend({
