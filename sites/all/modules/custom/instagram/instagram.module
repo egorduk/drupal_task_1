@@ -1,4 +1,5 @@
 <?php
+use MetzWeb\Instagram\Instagram;
 
 function instagram_entity_info() {
     $return = array(
@@ -56,4 +57,18 @@ function instagram_load($twitter_id, $reset = FALSE) {
 
 function instagram_load_multiple($product_ids = array(), $conditions = array(), $reset = FALSE) {
     return entity_load('instagram', $product_ids, $conditions, $reset);
+}
+
+function instagram_get_auth_link() {
+    require_once 'Instagram/src/Instagram.php';
+    $id = '0a8c859217034967b1aec64ee5a1d9fc';
+    $secret = '65bf77bcf7dc42d3b55e39b88e19b983';
+    $redirect_uri = 'http://localhost/drupal_task_1/user/test?social=instagram';
+    $instagram = new Instagram(array(
+        'apiKey'      => $id,
+        'apiSecret'   => $secret,
+        'apiCallback' => $redirect_uri
+    ));
+    $link = $instagram->getLoginUrl();
+    return $link;
 }

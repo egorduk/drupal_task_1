@@ -84,9 +84,9 @@ function _main_access($op, $args) {
 function _main_get_socials($mode) {
     if ($mode == 'get_socials') {
         $arr = [];
-        $arr[] = array('name' => 'twitter', 'status' => intval(getTwitterAccount()));
+        $arr[] = array('name' => 'twitter', 'status' => intval(getTwitterAccount()), 'sync_link' => twitter_get_auth_link());
         $arr[] = array('name' => 'facebook', 'status' => intval(true));
-        $arr[] = array('name' => 'instagram', 'status' => intval(false));
+        $arr[] = array('name' => 'instagram', 'status' => intval(false), 'sync_link' => instagram_get_auth_link());
         return ($arr);
     }
     return 'Error';

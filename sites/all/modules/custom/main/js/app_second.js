@@ -17,7 +17,7 @@ app.LibraryApp = function(){
         initialize: function() {
             console.log('SocialCollection initialize');
             var self = this;
-            app.vent.on("search:test", function(){
+            app.vent.on("social:getSocials", function(){
                 self.fetchSocials();
             });
         },
@@ -121,18 +121,23 @@ app.LibraryApp = function(){
         app.contentRegion.show(app.LibraryApp.layout);
     };
     //LibraryApp.search = function(term){
-    LibraryApp.search = function(){
+    LibraryApp.search = function() {
         //alert("search");
         LibraryApp.initializeLayout();
         //app.LibraryApp.BookList.showBooks(LibraryApp.Books);
-        app.SocialList.showBooks(LibraryApp.SocialCollection);
+        app.SocialViewer.showBooks(LibraryApp.SocialCollection);
         //app.vent.trigger("search:term", term);
-        app.vent.trigger("search:test");
-        console.log(LibraryApp.SocialCollection);
+        app.vent.trigger("social:getSocials");
+        //console.log(LibraryApp.SocialCollection);
+        Backbone.history.navigate("main");
+        console.log("Current fragment: " + Backbone.history.getFragment());
+
     };
     LibraryApp.home = function(){
+        //console.log(queryString);
         //alert('main');
         //this.search(LibraryApp.Books.previousSearch || "Neuromarketing");
+        LibraryApp.parseUrl();
         this.search();
     };
     LibraryApp.viewSocial = function(socialName){
@@ -142,9 +147,24 @@ app.LibraryApp = function(){
         console.log("reset " + socialName);
     };
     LibraryApp.syncSocial = function(socialName){
-        console.log("sync " + socialName);
-        var authLink = app.ConfigApp.getSocialAuthLink(socialName);
-        console.log(authLink);
+        //alert("sync ");
+        //var authLink = app.ConfigApp.getSocialAuthLink(socialName);
+        //console.log(authLink);
+    };
+    LibraryApp.parseUrl = function() {
+        var params = [],
+            queryString = window.location.href,
+            pair,
+            len,
+            d = decodeURIComponent;
+        queryString = queryString.substring(queryString.indexOf('?')+1).split('&');
+        len = queryString.length - 1;
+        for (var i = len; i >= 0; i--) {
+            pair = queryString[i].split('=');
+            params[d(pair[0])] = d(pair[1]);
+        }
+        console.log(params['social']);
+        return params;
     };
     return LibraryApp;
 }();

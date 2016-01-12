@@ -1,5 +1,5 @@
-app.SocialList = function(){
-    var SocialList = {};
+app.SocialViewer = function(){
+    var SocialViewer = {};
     var BookDetailView = Backbone.Marionette.ItemView.extend({
         template: "#book-detail-template",
         className: "modal bookDetail"
@@ -7,24 +7,25 @@ app.SocialList = function(){
     var SocialRowView = Backbone.Marionette.ItemView.extend({
         template: "#item-template",
         tagName: "tr",
-        events: {
-            //'click': 'showBookDetail'
+        /*events: {
+            'click': 'showBookDetail'
         },
         showBookDetail: function(){
             var detailView = new BookDetailView({model: this.model});
             app.modal.show(detailView);
-        },
+        },*/
         onRender: function() {
             var statusCell = this.$el.find("td").eq(1);
             var socialName = this.model.get("name");
             var socialStatus = this.model.get("status");
+            var socialSyncLink = (this.model.get("sync_link")) ? this.model.get("sync_link") : '#sync/' + socialName;
             //var authLink = app.ConfigApp.getSocialAuthLink(socialName);
             (socialStatus) ?
                 statusCell.html('<span class="status-true"></span>' +
                     '<a href="#view/' + socialName + '">View</a> | ' +
                     '<a href="#reset/' + socialName + '">Reset</a>') :
-                statusCell.html('<span class="status-false"></span><a href="#sync/' + socialName + '">Sync</a>');
-            console.log('GridRow: onRender');
+                statusCell.html('<span class="status-false"></span><a href="' + socialSyncLink + '">Sync</a>');
+            console.log('SocialRowView: onRender');
         }
     });
     var SocialListView = Backbone.Marionette.CompositeView.extend({
@@ -86,7 +87,7 @@ app.SocialList = function(){
             }
         }
     });
-    SocialList.showBooks = function(socials){
+    SocialViewer.showBooks = function(socials){
         var socialListView = new SocialListView({ collection: socials });
         app.LibraryApp.layout.mainContainer.show(socialListView);
     };
@@ -95,5 +96,5 @@ app.SocialList = function(){
         var searchView = new SearchView();
         app.LibraryApp.layout.search.attachView(searchView);
     });
-    return SocialList;
+    return SocialViewer;
 }();

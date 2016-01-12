@@ -21,6 +21,7 @@ var ModalRegion = Backbone.Marionette.Region.extend({
         this.$el.modal('hide');
     }
 });
+
 app.addRegions({
     menuRegion: '#menu',
     contentRegion: '#content1',
@@ -35,7 +36,7 @@ app.MenuView = Backbone.Marionette.View.extend({
     showMainPage: function(e){
         e.preventDefault();
         //alert('main');
-        app.LibraryApp.defaultSearch();
+        app.LibraryApp.search();
     },
     showFeedsPage: function(e){
         e.preventDefault();

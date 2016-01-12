@@ -39,7 +39,7 @@ function piy_page_callback() {
                 array('data' => $module_path . '/js/backbone.marionette.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/app.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/app_second.js', 'type' => 'file', 'scope' => 'footer'),
-                array('data' => $module_path . '/js/app_third.js', 'type' => 'file', 'scope' => 'footer'),
+                array('data' => $module_path . '/js/app_viewer.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/app_routing.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/app_closer.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/app_config.js', 'type' => 'file', 'scope' => 'footer'),

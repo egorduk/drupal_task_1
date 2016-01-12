@@ -1,5 +1,12 @@
 <?php
 
+require "twitter_api/autoload.php";
+use Abraham\TwitterOAuth\TwitterOAuth;
+
+define("CONSUMER_KEY", "Jt4lGWjVOJqvUalFyv911Dbkr");
+define("CONSUMER_SECRET", "LU32tiMn5NmCHzlfMTgFrmJjnPXsaaAfqQNTefdnoR1e3pcXqo");
+define("OAUTH_CALLBACK", "http://localhost/drupal_task_1/user/test?social=twitter");
+
 function twitter_entity_info() {
     $return = array(
         'twitter' => array(
@@ -73,4 +80,14 @@ function twitter_load_by_user() {
         ->fields('tw', array('tid'))
         ->condition('user_id', $user->uid);
     return $query->execute()->fetchField();
+}
+
+function twitter_get_auth_link() {
+    $connection = new TwitterOAuth(CONSUMER_KEY, CONSUMER_SECRET);
+    $request_token = $connection->oauth('oauth/request_token', array('oauth_callback' => OAUTH_CALLBACK));
+    //var_dump($request_token);
+    $link = $connection->url('oauth/authorize', array('oauth_token' => $request_token['oauth_token']));
+    $_SESSION['oauth_token'] = $request_token['oauth_token'];
+    $_SESSION['oauth_token_secret'] = $request_token['oauth_token_secret'];
+    return $link;
 }

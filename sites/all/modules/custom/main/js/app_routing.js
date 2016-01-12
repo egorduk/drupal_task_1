@@ -3,7 +3,7 @@ app.AppRouting = function(){
     AppRouting.Router = Backbone.Marionette.AppRouter.extend({
         appRoutes: {
             "": "home",
-            "search/:searchTerm": "search",
+            //"search/:searchTerm": "search",
             "view/:socialName" : "viewSocial",
             "reset/:socialName" : "resetSocial",
             "sync/:socialName" : "syncSocial"
