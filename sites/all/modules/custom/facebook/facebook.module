@@ -1,5 +1,9 @@
 <?php
 
+define("FACEBOOK_APP_ID", "1035129189845262");
+define("FACEBOOK_APP_SECRET", "1e121667b64b99f97148211d7df38a60");
+define("FACEBOOK_APP_REDIRECT_URL", "http://localhost/drupal_task_1/user/test?social=facebook");
+
 function facebook_entity_info() {
     $return = array(
         'facebook' => array(
@@ -56,4 +60,23 @@ function facebook_load($twitter_id, $reset = FALSE) {
 
 function facebook_load_multiple($product_ids = array(), $conditions = array(), $reset = FALSE) {
     return entity_load('facebook', $product_ids, $conditions, $reset);
+}
+
+function facebook_load_by_user() {
+    global $user;
+    $query = db_select('facebook', 'fb')
+        ->fields('fb', array('fid'))
+        ->condition('user_id', $user->uid);
+    return $query->execute()->fetchField();
+}
+
+function facebook_get_auth_link() {
+    $url = 'https://www.facebook.com/dialog/oauth';
+    $params = array(
+        'client_id'     => FACEBOOK_APP_ID,
+        'redirect_uri'  => FACEBOOK_APP_REDIRECT_URL,
+        'response_type' => 'code',
+        'scope'         => 'publish_actions,user_posts'
+    );
+    return $url . '?' . urldecode(http_build_query($params));
 }

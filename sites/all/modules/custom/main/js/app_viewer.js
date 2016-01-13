@@ -7,10 +7,17 @@ app.SocialViewer = function(){
     var SocialRowView = Backbone.Marionette.ItemView.extend({
         template: "#item-template",
         tagName: "tr",
-        /*events: {
-            'click': 'showBookDetail'
+        initialize: function() {
+            //console.log('SocialRowView: initialize');
+            this.listenTo(this.model, 'change', this.change);
+            this.listenTo(this.model, 'destroy', this.destroy);
         },
-        showBookDetail: function(){
+        events: {
+            'click': 'showBookDetail',
+            'click .reset': 'onClickReset',
+            'click .view': 'onClickView'
+        },
+        /*showBookDetail: function(){
             var detailView = new BookDetailView({model: this.model});
             app.modal.show(detailView);
         },*/
@@ -19,13 +26,29 @@ app.SocialViewer = function(){
             var socialName = this.model.get("name");
             var socialStatus = this.model.get("status");
             var socialSyncLink = (this.model.get("sync_link")) ? this.model.get("sync_link") : '#sync/' + socialName;
-            //var authLink = app.ConfigApp.getSocialAuthLink(socialName);
             (socialStatus) ?
                 statusCell.html('<span class="status-true"></span>' +
-                    '<a href="#view/' + socialName + '">View</a> | ' +
-                    '<a href="#reset/' + socialName + '">Reset</a>') :
+                    '<a class="view" href="#view/' + socialName + '">View</a> | ' +
+                    '<a class="reset" href="#reset/' + socialName + '">Reset</a>') :
                 statusCell.html('<span class="status-false"></span><a href="' + socialSyncLink + '">Sync</a>');
             console.log('SocialRowView: onRender');
+        },
+        change: function () {
+            console.log('SocialRowView: change');
+        },
+        destroy: function() {
+            console.log('SocialRowView: destroy');
+        },
+        onClickReset: function () {
+            this.model.save({status: 0}, {
+                success: function (model, response) {
+                    console.log(response);
+                },
+                error: function (model, response) {
+                    console.log(response.responseJSON);
+                },
+                wait: true
+            });
         }
     });
     var SocialListView = Backbone.Marionette.CompositeView.extend({
@@ -46,11 +69,11 @@ app.SocialViewer = function(){
             app.vent.on("search:noResults", function(){
                 self.showMessage("No books found")
             });*/
-        },
+        }
        /* appendHtml: function(collectionView, itemView){
             console.log(itemView.el);
             collectionView.$(".books").append(itemView.el);
-        },*/
+        },
         showMessage: function(message){
             this.$('.books').html('<h1 class="notFound">' + message + '</h1>');
         },
@@ -62,7 +85,7 @@ app.SocialViewer = function(){
             if (scrollTop + margin >= totalHeight) {
                 app.vent.trigger("search:more");
             }
-        }
+        }*/
     });
     var SearchView = Backbone.View.extend({
         el: "#searchBar",

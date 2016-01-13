@@ -7,8 +7,8 @@ function twitter_schema() {
                 'fields' => array(
                     'tid' => array('type' => 'serial',  'size' => 'normal',  'not null' => TRUE),
                     'user_id' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0),
-                    'user_login' => array('type' => 'varchar', 'length' => 50, 'not null' => TRUE),
-                    'user_pass' => array('type' => 'varchar', 'length' => 50, 'not null' => TRUE)
+                    'oauth_token' => array('type' => 'varchar', 'length' => 150, 'not null' => TRUE),
+                    'oauth_token_secret' => array('type' => 'varchar', 'length' => 150, 'not null' => TRUE)
                 ),
                 'primary key' => array('tid'),
                 'foreign keys' => array(

@@ -22,7 +22,7 @@ function _main_create($data) {
 
 function _main_update($id, $data) {
     global $user;
-    $note = main_get_note($id);
+    /*$note = main_get_note($id);
     unset($data->created);
     $data->id = $id;
     $data->uid = $note->uid;
@@ -31,7 +31,9 @@ function _main_update($id, $data) {
     return (object)array(
         'id' => $id,
         'uri' => services_resource_uri(array('note', $id)),
-    );
+    );*/
+    var_dump($id);
+    var_dump($data);die;
 }
 
 function _main_retrieve($id) {
@@ -84,9 +86,12 @@ function _main_access($op, $args) {
 function _main_get_socials($mode) {
     if ($mode == 'get_socials') {
         $arr = [];
-        $arr[] = array('name' => 'twitter', 'status' => intval(getTwitterAccount()), 'sync_link' => twitter_get_auth_link());
-        $arr[] = array('name' => 'facebook', 'status' => intval(true));
-        $arr[] = array('name' => 'instagram', 'status' => intval(false), 'sync_link' => instagram_get_auth_link());
+        $twitterStatus = $twitterId = getTwitterAccount();
+        $fbStatus = $fbId = getFacebookAccount();
+        $instagramStatus = $instagramId = getInstagramAccount();
+        $arr[] = array('name' => 'twitter', 'status' => (bool)$twitterStatus, 'sync_link' => twitter_get_auth_link(), 'uid' => $twitterId);
+        $arr[] = array('name' => 'facebook', 'status' => (bool)$fbStatus, 'sync_link' => facebook_get_auth_link(), 'uid' => $fbId);
+        $arr[] = array('name' => 'instagram', 'status' => (bool)$instagramStatus, 'sync_link' => instagram_get_auth_link(), 'uid' => $instagramId);
         return ($arr);
     }
     return 'Error';
@@ -94,4 +99,12 @@ function _main_get_socials($mode) {
 
 function getTwitterAccount() {
     return twitter_load_by_user();
+}
+
+function getInstagramAccount() {
+    return instagram_load_by_user();
+}
+
+function getFacebookAccount() {
+    return facebook_load_by_user();
 }

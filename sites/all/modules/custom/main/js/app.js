@@ -31,17 +31,21 @@ app.MenuView = Backbone.Marionette.View.extend({
     el: "#menu",
     events: {
         'click #menu .js-menu-main': 'showMainPage',
-        'click #menu .js-menu-feeds': 'showFeedsPage'
+        'click #menu .js-menu-feeds': 'showFeedsPage',
+        'click #menu .js-menu-exit': 'exit'
     },
-    showMainPage: function(e){
+    showMainPage: function(e) {
         e.preventDefault();
         //alert('main');
         app.LibraryApp.search();
     },
-    showFeedsPage: function(e){
+    showFeedsPage: function(e) {
         e.preventDefault();
         //alert('feeds');
         app.Closer.close();
+    },
+    exit: function(e) {
+        window.location.href = "http://localhost/drupal_task_1/user/test";
     }
 });
 app.vent.on("layout:rendered", function(){

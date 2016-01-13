@@ -3,8 +3,6 @@ use MetzWeb\Instagram\Instagram;
 
 function instagram_page_view() {
     require_once 'Instagram/src/Instagram.php';
-    $id = '0a8c859217034967b1aec64ee5a1d9fc';
-    $secret = '65bf77bcf7dc42d3b55e39b88e19b983';
     $redirect_uri = 'http://localhost/drupal_task_1/admin/config/instagram';
     /*echo '<div><a href="https://api.instagram.com/oauth/authorize/?client_id='.$id.'&redirect_uri='.$redirect_uri.'&response_type=code">Link</a></div>';
     if (isset($_GET['code'])) {
@@ -20,8 +18,8 @@ function instagram_page_view() {
     }*/
 
     $instagram = new Instagram(array(
-        'apiKey'      => $id,
-        'apiSecret'   => $secret,
+        'apiKey'      => INSTAGRAM_ID,
+        'apiSecret'   => INSTAGRAM_SECRET,
         'apiCallback' => $redirect_uri
     ));
     echo "<a href='{$instagram->getLoginUrl()}'>Login with Instagram</a>";

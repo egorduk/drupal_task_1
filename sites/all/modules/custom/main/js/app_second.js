@@ -8,6 +8,7 @@ app.LibraryApp = function(){
         }
     });
     var SocialModel = Backbone.Model.extend({
+        urlRoot: '/drupal_task_1/notes/social',
         defaults: {}
     });
     var SocialCollection = Backbone.Collection.extend({
@@ -15,7 +16,7 @@ app.LibraryApp = function(){
         comparator: 'name',
         url: '/drupal_task_1/notes/social/get_socials.json',
         initialize: function() {
-            console.log('SocialCollection initialize');
+            console.log('SocialCollection: initialize');
             var self = this;
             app.vent.on("social:getSocials", function(){
                 self.fetchSocials();
@@ -44,8 +45,6 @@ app.LibraryApp = function(){
             // flags whether the collection is currently in the process of fetching
             // more results from the API (to avoid multiple simultaneous calls
             this.loading = false;
-            // remember the previous search
-            this.previousSearch = null;
             // the maximum number of results for the previous search
             this.totalItems = null;
         },
@@ -55,7 +54,6 @@ app.LibraryApp = function(){
             this.fetchBooks(searchTerm, function(books) {
                 (books.length < 1) ? app.vent.trigger("search:noResults") : self.reset(books);
             });
-            this.previousSearch = searchTerm;
         },
         moreBooks: function(){
             // if we've loaded all the books for this search, there are no more to load !
@@ -129,15 +127,19 @@ app.LibraryApp = function(){
         //app.vent.trigger("search:term", term);
         app.vent.trigger("social:getSocials");
         //console.log(LibraryApp.SocialCollection);
-        Backbone.history.navigate("main");
-        console.log("Current fragment: " + Backbone.history.getFragment());
-
+        //Backbone.history.navigate("main");
+        //console.log("Current fragment: " + Backbone.history.getFragment());
     };
-    LibraryApp.home = function(){
-        //console.log(queryString);
-        //alert('main');
-        //this.search(LibraryApp.Books.previousSearch || "Neuromarketing");
-        LibraryApp.parseUrl();
+    LibraryApp.home = function() {
+        /*var parsedArrayUrl = LibraryApp.parseUrl();
+        if (parsedArrayUrl['social'] == 'twitter') {
+            app.vent.trigger("social:authSuccess:twitter");
+            console.log('Vent: social:authSuccess:twitter');
+        } else if (parsedArrayUrl['social'] == 'instagram') {
+            app.vent.trigger("social:authSuccess:instagram");
+        } else if (parsedArrayUrl['social'] == 'facebook') {
+            app.vent.trigger("social:authSuccess:facebook");
+        }*/
         this.search();
     };
     LibraryApp.viewSocial = function(socialName){
@@ -147,9 +149,7 @@ app.LibraryApp = function(){
         console.log("reset " + socialName);
     };
     LibraryApp.syncSocial = function(socialName){
-        //alert("sync ");
-        //var authLink = app.ConfigApp.getSocialAuthLink(socialName);
-        //console.log(authLink);
+        console.log("sync " + socialName);
     };
     LibraryApp.parseUrl = function() {
         var params = [],
@@ -157,13 +157,13 @@ app.LibraryApp = function(){
             pair,
             len,
             d = decodeURIComponent;
-        queryString = queryString.substring(queryString.indexOf('?')+1).split('&');
+        queryString = queryString.substring(queryString.indexOf('?') + 1).split('&');
         len = queryString.length - 1;
         for (var i = len; i >= 0; i--) {
             pair = queryString[i].split('=');
             params[d(pair[0])] = d(pair[1]);
         }
-        console.log(params['social']);
+        //console.log(params['social']);
         return params;
     };
     return LibraryApp;

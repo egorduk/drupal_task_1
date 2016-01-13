@@ -85,7 +85,6 @@ function twitter_load_by_user() {
 function twitter_get_auth_link() {
     $connection = new TwitterOAuth(CONSUMER_KEY, CONSUMER_SECRET);
     $request_token = $connection->oauth('oauth/request_token', array('oauth_callback' => OAUTH_CALLBACK));
-    //var_dump($request_token);
     $link = $connection->url('oauth/authorize', array('oauth_token' => $request_token['oauth_token']));
     $_SESSION['oauth_token'] = $request_token['oauth_token'];
     $_SESSION['oauth_token_secret'] = $request_token['oauth_token_secret'];

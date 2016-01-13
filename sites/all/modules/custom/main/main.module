@@ -17,14 +17,15 @@ function main_menu() {
         'file' => 'social.pages.inc',
     );
     $items['user/test'] = array(
-        'title' => 'home page',
-        'page callback' => 'piy_page_callback',
+        'title' => 'Home page',
+        'page callback' => 'main_page_callback',
         'access callback' => TRUE,
+        'file' => 'main.pages.inc'
     );
     return $items;
 }
 
-function piy_page_callback() {
+function main_page_callback() {
     $module_path = drupal_get_path('module', 'main');
     $content = array(
         '#markup' => '',
@@ -44,12 +45,6 @@ function piy_page_callback() {
                 array('data' => $module_path . '/js/app_closer.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/app_config.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/app_start.js', 'type' => 'file', 'scope' => 'footer')
-        /*        array('data' => $module_path . '/javascript/app.js', 'type' => 'file', 'scope' => 'footer'),
-                array('data' => $module_path . '/javascript/app.library_app.js', 'type' => 'file', 'scope' => 'footer'),
-                array('data' => $module_path . '/javascript/app.library_app.book_list.js', 'type' => 'file', 'scope' => 'footer'),
-                array('data' => $module_path . '/javascript/app.library_app.routing.js', 'type' => 'file', 'scope' => 'footer'),
-                array('data' => $module_path . '/javascript/app.closer.js', 'type' => 'file', 'scope' => 'footer'),
-                array('data' => $module_path . '/javascript/app_start.js', 'type' => 'file', 'scope' => 'footer')*/
             ),
             /*'css' => array(
                 array('data' => $module_path . '/path/to/mybackboneapp.css', 'type' => 'file'),
@@ -382,7 +377,7 @@ function main_services_resources() {
                 )
             ),*/
             'index' => array(
-                'help' => 'Retrieves a listing of notes',
+                'help' => 'Retrieves a listing of socials',
                 'file' => array('file' => 'inc', 'module' => 'main'),
                 'callback' => '_main_get_socials',
                 'access arguments' => array('administer site configuration'),
@@ -396,7 +391,29 @@ function main_services_resources() {
                         'optional' => FALSE,
                     ),
                 ),
-            )
+            ),
+            'update' => array(
+                'help' => 'Updates a social status',
+                'file' => array('file' => 'inc', 'module' => 'main'),
+                'callback' => '_main_update',
+                'access arguments' => array('administer site configuration'),
+                'args' => array(
+                    array(
+                        'name' => 'id',
+                        'type' => 'int',
+                        'description' => 'The id of the node to update',
+                        'source' => array('path' => '0'),
+                        'optional' => FALSE,
+                    ),
+                    array(
+                        'name' => 'data',
+                        'type' => 'struct',
+                        'description' => 'The note data object',
+                        'source' => 'data',
+                        'optional' => FALSE,
+                    ),
+                ),
+            ),
         )
     );
 }
@@ -410,14 +427,32 @@ function getSocials() {
     return $arr;
 }
 
-function getFacebookAccount() {
-
-}
-
-/*function getTwitterAccount() {
-    return twitter_load_by_user();
-}*/
-
-function getInstagramAccount() {
-
+function main_save_social_data($arrayData) {
+    global $user;
+    if ($arrayData['social'] == 'twitter') {
+        db_insert('twitter')
+            ->fields(array('user_id', 'oauth_token', 'oauth_token_secret'))
+            ->values(array(
+                'user_id' => $user->uid,
+                'oauth_token' => $arrayData['oauth_token'],
+                'oauth_token_secret' => $arrayData['oauth_token_secret'],
+            ))
+            ->execute();
+    } elseif ($arrayData['social'] == 'instagram') {
+        db_insert('instagram')
+            ->fields(array('user_id', 'access_token'))
+            ->values(array(
+                'user_id' => $user->uid,
+                'access_token' => $arrayData['access_token']
+            ))
+            ->execute();
+    } elseif ($arrayData['social'] == 'facebook') {
+        db_insert('facebook')
+            ->fields(array('user_id', 'access_token'))
+            ->values(array(
+                'user_id' => $user->uid,
+                'access_token' => $arrayData['access_token']
+            ))
+            ->execute();
+    }
 }

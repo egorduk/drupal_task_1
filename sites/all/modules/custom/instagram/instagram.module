@@ -1,6 +1,10 @@
 <?php
 use MetzWeb\Instagram\Instagram;
 
+define("INSTAGRAM_ID", "0a8c859217034967b1aec64ee5a1d9fc");
+define("INSTAGRAM_SECRET", "65bf77bcf7dc42d3b55e39b88e19b983");
+define("INSTAGRAM_CALLBACK", "http://localhost/drupal_task_1/user/test?social=instagram");
+
 function instagram_entity_info() {
     $return = array(
         'instagram' => array(
@@ -51,7 +55,7 @@ function instagram_menu() {
 }
 
 function instagram_load($twitter_id, $reset = FALSE) {
-    $products =instagram_load_multiple(array($twitter_id), array(), $reset);
+    $products = instagram_load_multiple(array($twitter_id), array(), $reset);
     return $products ? reset($products) : FALSE;
 }
 
@@ -61,14 +65,19 @@ function instagram_load_multiple($product_ids = array(), $conditions = array(), 
 
 function instagram_get_auth_link() {
     require_once 'Instagram/src/Instagram.php';
-    $id = '0a8c859217034967b1aec64ee5a1d9fc';
-    $secret = '65bf77bcf7dc42d3b55e39b88e19b983';
-    $redirect_uri = 'http://localhost/drupal_task_1/user/test?social=instagram';
     $instagram = new Instagram(array(
-        'apiKey'      => $id,
-        'apiSecret'   => $secret,
-        'apiCallback' => $redirect_uri
+        'apiKey'      => INSTAGRAM_ID,
+        'apiSecret'   => INSTAGRAM_SECRET,
+        'apiCallback' => INSTAGRAM_CALLBACK
     ));
     $link = $instagram->getLoginUrl();
     return $link;
+}
+
+function instagram_load_by_user() {
+    global $user;
+    $query = db_select('instagram', 'inst')
+        ->fields('inst', array('iid'))
+        ->condition('user_id', $user->uid);
+    return $query->execute()->fetchField();
 }
