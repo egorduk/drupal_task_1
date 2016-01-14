@@ -21,7 +21,7 @@ function _main_create($data) {
 }
 
 function _main_update($id, $data) {
-    global $user;
+    //global $user;
     /*$note = main_get_note($id);
     unset($data->created);
     $data->id = $id;

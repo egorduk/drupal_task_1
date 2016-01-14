@@ -381,6 +381,7 @@ function main_services_resources() {
                 'file' => array('file' => 'inc', 'module' => 'main'),
                 'callback' => '_main_get_socials',
                 'access arguments' => array('administer site configuration'),
+                'access arguments append' => TRUE,
                 //'args' => array()
                 'args' => array(
                     array(
@@ -397,6 +398,8 @@ function main_services_resources() {
                 'file' => array('file' => 'inc', 'module' => 'main'),
                 'callback' => '_main_update',
                 'access arguments' => array('administer site configuration'),
+                //'access arguments' => TRUE,
+                //'access arguments append' => TRUE,
                 'args' => array(
                     array(
                         'name' => 'id',

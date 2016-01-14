@@ -40,7 +40,7 @@ app.SocialViewer = function(){
             console.log('SocialRowView: destroy');
         },
         onClickReset: function () {
-            this.model.save({status: 0}, {
+            /*this.model.save({status: 0}, {
                 success: function (model, response) {
                     console.log(response);
                 },
@@ -48,7 +48,21 @@ app.SocialViewer = function(){
                     console.log(response.responseJSON);
                 },
                 wait: true
+            });*/
+            //console.log(this.model.isNew());
+            this.model.set({
+                id: '1'
             });
+            //Backbone.emulateHTTP = false;
+            this.model.save();
+            /*$.ajax({
+                url: 'http://localhost/drupal_task_1/notes/social/1',
+                dataType: 'json',
+                type: 'put',
+                data: 'name='+"1",
+                success: function (res) {
+                }
+            });*/
         }
     });
     var SocialListView = Backbone.Marionette.CompositeView.extend({

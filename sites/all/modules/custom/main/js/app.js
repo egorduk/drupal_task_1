@@ -27,6 +27,10 @@ app.addRegions({
     contentRegion: '#content1',
     //modal: ModalRegion
 });
+/*Backbone.sync = function(method, model) {
+    alert(method + ": " + JSON.stringify(model));
+    model.set('id', 1);
+};*/
 app.MenuView = Backbone.Marionette.View.extend({
     el: "#menu",
     events: {
