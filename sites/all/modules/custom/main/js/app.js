@@ -52,6 +52,25 @@ app.MenuView = Backbone.Marionette.View.extend({
         window.location.href = "http://localhost/drupal_task_1/user/test";
     }
 });
+app.NoticeView = Marionette.ItemView.extend({
+    template: "#notice-item",
+    notice: '',
+    type: '',
+    events: {
+        'click': 'closeNotice'
+    },
+    setNotice: function(notice, type) {
+        this.notice = notice;
+        this.type = type;
+    },
+    onRender: function() {
+        this.$el.addClass(this.type);
+        this.$el.html(this.notice);
+    },
+    closeNotice: function() {
+        this.$el.empty();
+    }
+});
 app.vent.on("layout:rendered", function(){
     console.log("layout:rendered");
     var menu = new app.MenuView();

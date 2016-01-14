@@ -4,6 +4,7 @@ app.SocialViewer = function(){
         template: "#book-detail-template",
         className: "modal bookDetail"
     });
+    var NoticeView = new app.NoticeView();
     var SocialRowView = Backbone.Marionette.ItemView.extend({
         template: "#item-template",
         tagName: "tr",
@@ -13,7 +14,6 @@ app.SocialViewer = function(){
             this.listenTo(this.model, 'destroy', this.destroy);
         },
         events: {
-            'click': 'showBookDetail',
             'click .reset': 'onClickReset',
             'click .view': 'onClickView'
         },
@@ -29,7 +29,8 @@ app.SocialViewer = function(){
             (socialStatus) ?
                 statusCell.html('<span class="status-true"></span>' +
                     '<a class="view" href="#view/' + socialName + '">View</a> | ' +
-                    '<a class="reset" href="#reset/' + socialName + '">Reset</a>') :
+                    //'<a class="reset" href="#reset/' + socialName + '">Reset</a>') :
+                    '<a class="reset">Reset</a>') :
                 statusCell.html('<span class="status-false"></span><a href="' + socialSyncLink + '">Sync</a>');
             console.log('SocialRowView: onRender');
         },
@@ -40,29 +41,38 @@ app.SocialViewer = function(){
             console.log('SocialRowView: destroy');
         },
         onClickReset: function () {
-            /*this.model.save({status: 0}, {
-                success: function (model, response) {
-                    console.log(response);
+            var self = this;
+            $.ajax({
+                url: "?q=services/session/token",
+                type: "GET",
+                dataType: "text",
+                error: function (jqXHR, textStatus, errorThrown) {
+                    //alert(errorThrown);
+                    NoticeView.setNotice(textStatus, 'error');
+                    self.showNotice();
                 },
-                error: function (model, response) {
-                    console.log(response.responseJSON);
-                },
-                wait: true
-            });*/
-            //console.log(this.model.isNew());
-            this.model.set({
-                id: '1'
-            });
-            //Backbone.emulateHTTP = false;
-            this.model.save();
-            /*$.ajax({
-                url: 'http://localhost/drupal_task_1/notes/social/1',
-                dataType: 'json',
-                type: 'put',
-                data: 'name='+"1",
-                success: function (res) {
+                success: function (token) {
+                    self.model.save({'status': 13}, {
+                        success: function (model, response) {
+                            //NoticeView.setNotice(response.responseText, 'success');
+                            //self.showNotice();
+                            console.log(response);
+                            alert('s');
+                        },
+                        error: function (model, response) {
+                            //NoticeView.setNotice(response.responseText, 'error');
+                            //self.showNotice();
+                            console.log(response);
+                            alert('e');
+                        },
+                        wait: true
+                    });
+                    //self.model.save();
                 }
-            });*/
+            });
+        },
+        showNotice: function() {
+            app.LibraryApp.layout.noticeContainer.show(NoticeView.render());
         }
     });
     var SocialListView = Backbone.Marionette.CompositeView.extend({
