@@ -70,6 +70,7 @@ function main_page_callback() {
     </div>
 </script>-->
 
+<script type="text/template" id="notice-item"></script>
 <div id="menu">
     <a href="#main" class="js-menu-main">Main</a>
     <a href="#feeds" class="js-menu-feeds">Feeds</a>
@@ -90,12 +91,11 @@ function main_page_callback() {
       <div class="books"><%=status%></div>
     </div>
 </script>-->
-<script type="text/template" id="book-template">
-</script>
 <script type="text/template" id="book-detail-template">
     <a class="close" data-dismiss="modal">x</a>
 </script>
 <script type="text/template" id="layout-template">
+    <div id="noticeContainer"></div>
     <div id="mainContainer"></div>
 </script>
 <script type="text/template" id="list-template">

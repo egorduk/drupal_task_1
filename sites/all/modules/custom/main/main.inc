@@ -32,8 +32,8 @@ function _main_update($id, $data) {
         'id' => $id,
         'uri' => services_resource_uri(array('note', $id)),
     );*/
-    var_dump($id);
-    var_dump($data);die;
+    return ($id);
+    //var_dump($data);
 }
 
 function _main_retrieve($id) {
@@ -89,9 +89,9 @@ function _main_get_socials($mode) {
         $twitterStatus = $twitterId = getTwitterAccount();
         $fbStatus = $fbId = getFacebookAccount();
         $instagramStatus = $instagramId = getInstagramAccount();
-        $arr[] = array('name' => 'twitter', 'status' => (bool)$twitterStatus, 'sync_link' => twitter_get_auth_link(), 'uid' => $twitterId);
-        $arr[] = array('name' => 'facebook', 'status' => (bool)$fbStatus, 'sync_link' => facebook_get_auth_link(), 'uid' => $fbId);
-        $arr[] = array('name' => 'instagram', 'status' => (bool)$instagramStatus, 'sync_link' => instagram_get_auth_link(), 'uid' => $instagramId);
+        $arr[] = array('name' => 'twitter', 'status' => (bool)$twitterStatus, 'sync_link' => twitter_get_auth_link(), 'id' => 't' . $twitterId);
+        $arr[] = array('name' => 'facebook', 'status' => (bool)$fbStatus, 'sync_link' => facebook_get_auth_link(), 'id' => 'f' . $fbId);
+        $arr[] = array('name' => 'instagram', 'status' => (bool)$instagramStatus, 'sync_link' => instagram_get_auth_link(), 'id' => 'i' . $instagramId);
         return ($arr);
     }
     return 'Error';
