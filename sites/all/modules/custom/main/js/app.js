@@ -1,7 +1,7 @@
 /* create a new instance of the Marionette app */
 
 var app = new Backbone.Marionette.Application();
-var ModalRegion = Backbone.Marionette.Region.extend({
+/*var ModalRegion = Backbone.Marionette.Region.extend({
     el: "#modal",
     constructor: function(){
         //_.bindAll(this);
@@ -20,12 +20,13 @@ var ModalRegion = Backbone.Marionette.Region.extend({
     hideModal: function(){
         this.$el.modal('hide');
     }
-});
+});*/
 
 app.addRegions({
     menuRegion: '#menu',
     contentRegion: '#content1',
-    modal: ModalRegion
+    modal: '#modal'
+    //modal: ModalRegion
 });
 /*Backbone.sync = function(method, model) {
     alert(method + ": " + JSON.stringify(model));
@@ -52,7 +53,7 @@ app.MenuView = Backbone.Marionette.View.extend({
         window.location.href = "http://localhost/drupal_task_1/user/test";
     }
 });
-app.NoticeView = Marionette.ItemView.extend({
+app.NoticeView = Backbone.Marionette.ItemView.extend({
     template: "#notice-item",
     notice: '',
     type: '',
@@ -71,12 +72,12 @@ app.NoticeView = Marionette.ItemView.extend({
         this.$el.empty();
     }
 });
-app.vent.on("layout:rendered", function(){
+app.vent.on("layout: rendered", function(){
     console.log("layout:rendered");
     var menu = new app.MenuView();
     app.menuRegion.attachView(menu);
 });
-app.vent.on("routing:started", function(){
+app.vent.on("routing: started", function(){
     console.log("routing:started");
     if (!Backbone.History.started) {
         Backbone.history.start();

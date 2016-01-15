@@ -4,7 +4,7 @@ app.AppRouting = function(){
         appRoutes: {
             "": "home",
             //"search/:searchTerm": "search",
-            //"view/:socialName" : "viewSocial",
+            "view/:socialName" : "viewSocial",
             /*"reset/:socialName" : "resetSocial",
             "sync/:socialName" : "syncSocial"*/
         }

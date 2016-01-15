@@ -5,7 +5,8 @@ app.LibraryApp = function(){
         regions: {
             search: "#searchBar",
             mainContainer: "#mainContainer",
-            noticeContainer: "#noticeContainer"
+            noticeContainer: "#noticeContainer",
+            modalContainer: '#modalContainer'
         }
     });
     var token = '', flOnlyOneRequest = true;
@@ -37,13 +38,32 @@ app.LibraryApp = function(){
             return Backbone.sync.call(this, method, collection, options);
         }
     });
-    //var SocialModel = Backbone.Model.extend({
     var PostModel = Backbone.Model.extend({
         urlRoot: '/drupal_task_1/notes/post',
         defaults: {
-            author: '',
+           /* author: '',
             content: '',
-            date_post: ''
+            date_post: ''*/
+        }
+    });
+    var PostCollection = Backbone.Collection.extend({
+        model: PostModel,
+        //comparator: 'name',
+        //url: '/drupal_task_1/notes/post/get_posts.json',
+        url: '/drupal_task_1/notes/post/get_posts.json',
+        initialize: function() {
+            console.log('PostCollection: initialize');
+            var self = this;
+            app.vent.on("post:getPosts", function(){
+                self.fetchPosts();
+            });
+        },
+        fetchPosts: function() {
+            this.fetch({}).fail(function(){}).done(function(a) {
+                console.log(a);
+                //callback(a);
+                //return a;
+            });
         }
     });
     var SocialModel = Backbone.AuthenticatedModel.extend({
@@ -149,20 +169,18 @@ app.LibraryApp = function(){
         }
     });
     LibraryApp.SocialCollection = new SocialCollection();
+    LibraryApp.PostCollection = new PostCollection();
     LibraryApp.initializeLayout = function(){
         LibraryApp.layout = new Layout();
         LibraryApp.layout.on("show", function(){
-            app.vent.trigger("layout:rendered");
+            app.vent.trigger("layout: rendered");
         });
         app.contentRegion.show(app.LibraryApp.layout);
     };
     //LibraryApp.search = function(term){
     LibraryApp.search = function() {
-        //alert("search");
         LibraryApp.initializeLayout();
-        //app.LibraryApp.BookList.showBooks(LibraryApp.Books);
-        app.SocialViewer.showBooks(LibraryApp.SocialCollection);
-        //app.vent.trigger("search:term", term);
+        app.SocialViewer.showTableSocial(LibraryApp.SocialCollection);
         app.vent.trigger("social:getSocials");
         //console.log(LibraryApp.SocialCollection);
         //Backbone.history.navigate("main");
@@ -182,10 +200,15 @@ app.LibraryApp = function(){
     };
     LibraryApp.viewSocial = function(socialName){
         console.log("view " + socialName);
+        LibraryApp.initializeLayout();
+        app.SocialViewer.showSocialDetails(LibraryApp.PostCollection);
+        app.vent.trigger("post:getPosts");
+        //console.log(LibraryApp.PostCollection);
+
     };
-    LibraryApp.resetSocial = function(socialName){
+    /*LibraryApp.resetSocial = function(socialName){
         console.log("reset " + socialName);
-    };
+    };*/
     LibraryApp.syncSocial = function(socialName){
         console.log("sync " + socialName);
     };

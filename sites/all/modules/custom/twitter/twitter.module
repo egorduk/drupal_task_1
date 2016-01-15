@@ -99,3 +99,12 @@ function twitter_reset($id) {
         ->execute();
     //return 1;
 }
+
+function twitter_get_posts($id) {
+    global $user;
+    $twitterData = db_select('twitter', 'tw')
+        ->fields('tw', array('tid'))
+        ->condition('user_id', $user->uid)
+        ->execute()
+        ->fetchAssoc();
+}

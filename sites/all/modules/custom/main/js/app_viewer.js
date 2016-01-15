@@ -4,9 +4,25 @@ app.SocialViewer = function(){
         template: "#book-detail-template",
         className: "modal bookDetail"
     });*/
-    var SocialView = Backbone.Marionette.ItemView.extend({
-        template: "#social-template",
-        className: "modal socialDetail"
+    var SocialDetailItemView = Backbone.Marionette.ItemView.extend({
+        template: "#social-item-template",
+        initialize: function(){
+            //console.log('SocialDetailItemView: initialize');
+        },
+        onRender: function() {
+            //console.log('SocialDetailItemView: onRender');
+        }
+    });
+    var SocialDetailListView = Backbone.Marionette.CompositeView.extend({
+        template: "#social-list-template",
+        className: "modal socialDetail",
+        childView: SocialDetailItemView,
+        initialize: function(){
+            //console.log('SocialDetailListView: initialize');
+        },
+        onRender: function() {
+           // console.log('SocialDetailListView: onRender');
+        }
     });
     var NoticeView = new app.NoticeView();
     var SocialRowView = Backbone.Marionette.ItemView.extend({
@@ -20,7 +36,7 @@ app.SocialViewer = function(){
         },
         events: {
             'click .reset': 'onClickReset',
-            'click .view': 'onClickView'
+            //'click .view': 'onClickView'
         },
         /*showBookDetail: function(){
             var detailView = new BookDetailView({model: this.model});
@@ -33,8 +49,8 @@ app.SocialViewer = function(){
             var socialSyncLink = (this.model.get("sync_link")) ? this.model.get("sync_link") : '#sync/' + socialName;
             (socialStatus) ?
                 statusCell.html('<span class="status-true"></span>' +
-                    '<a class="view">View</a> | ' +
-                    //'<a class="view" href="#view/' + socialName + '">View</a> | ' +
+                    //'<a class="view">View</a> | ' +
+                    '<a class="view" href="#view/' + socialName + '">View</a> | ' +
                     //'<a class="reset" href="#reset/' + socialName + '">Reset</a>') :
                     '<a class="reset">Reset</a>') :
                 statusCell.html('<span class="status-false"></span><a href="' + socialSyncLink + '">Sync</a>');
@@ -71,8 +87,9 @@ app.SocialViewer = function(){
 
         },
         onClickView: function() {
-            var socialView = new SocialView();
-            app.modal.show(socialView);
+            //var posts = new app.LibraryApp.Post();
+            //var socialView = new SocialView({ collection: posts});
+            //app.modal.show(socialView);
         },
         showNotice: function() {
             app.LibraryApp.layout.noticeContainer.show(NoticeView.render());
@@ -137,14 +154,22 @@ app.SocialViewer = function(){
             }
         }
     });
-    SocialViewer.showBooks = function(socials){
+    SocialViewer.showTableSocial = function(socials){
         var socialListView = new SocialListView({ collection: socials });
         app.LibraryApp.layout.mainContainer.show(socialListView);
     };
+    SocialViewer.showSocialDetails = function(posts){
+        console.log(posts);
+        var socialDetailView = new SocialDetailListView({ collection: posts });
+        //console.log(socialDetailView);
+        //app.modal.show(socialDetailView);
+        //socialDetailView.render();
+        app.LibraryApp.layout.modalContainer.show(socialDetailView);
+    };
     app.vent.on("layout:rendered", function(){
         // render a view for the existing HTML in the template, and attach it to the layout (i.e. don't double render)
-        var searchView = new SearchView();
-        app.LibraryApp.layout.search.attachView(searchView);
+        //var searchView = new SearchView();
+        //app.LibraryApp.layout.search.attachView(searchView);
     });
     return SocialViewer;
 }();

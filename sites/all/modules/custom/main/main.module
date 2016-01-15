@@ -78,7 +78,7 @@ function main_page_callback() {
 <div id="menu">
     <a href="#main" class="js-menu-main">Main</a>
     <a href="#feeds" class="js-menu-feeds">Feeds</a>
-    <a href="#exit" class="js-menu-exit">Exit</a>
+    <a href="http://localhost/drupal_task_1/user/test" class="js-menu-exit">Exit</a>
 </div>
 <div id="content1"></div>
 <div id="modal"></div>
@@ -95,14 +95,10 @@ function main_page_callback() {
       <div class="books"><%=status%></div>
     </div>
 </script>-->
-<script type="text/template" id="social-template">
-    <a class="close" data-dismiss="modal">x</a>
-    <textarea placeholder="Комментировать"></textarea>
-    <button class="save">Отправить</button>
-</script>
 <script type="text/template" id="layout-template">
     <div id="noticeContainer"></div>
     <div id="mainContainer"></div>
+    <div id="modalContainer"></div>
 </script>
 <script type="text/template" id="list-template">
     <thead>
@@ -119,6 +115,18 @@ function main_page_callback() {
 </script>
 <script type="text/template" id="close-template">
     <p>That\'s all, folks !</p>
+</script>
+<script type="text/template" id="social-item-template">
+    <div class="post-detail">
+        <div class="author"><%=author%></div>
+        <div class="content"><%=content%></div>
+        <div class="date_post"><%=date_post%></div>
+    </div>
+</script>
+<script type="text/template" id="social-list-template">
+    <a class="close" data-dismiss="modal" href="#">x</a>
+    <textarea placeholder="Комментировать"></textarea>
+    <button class="save">Отправить</button>
 </script>
 
 
@@ -416,6 +424,38 @@ function main_services_resources() {
                     )
                 ),
             ),
+        ),
+        'post' => array(
+            'index' => array(
+                'help' => 'Retrieves a listing of posts',
+                'file' => array('file' => 'inc', 'module' => 'main'),
+                'callback' => '_main_get_posts',
+                'access arguments' => array('administer site configuration'),
+                'args' => array(
+                    array(
+                        'name' => 'id',
+                        'type' => 'int',
+                        'description' => 'The id of the selected social',
+                        'source' => array('path' => '0'),
+                        'optional' => FALSE,
+                    ),
+                ),
+            ),
+            /*'retrieve' => array(
+                'help' => 'Retrieves a note',
+                'file' => array('file' => 'inc', 'module' => 'main'),
+                'callback' => '_main_get_posts',
+                'access arguments' => array('administer site configuration'),
+                'args' => array(
+                    array(
+                        'name' => 'id',
+                        'type' => 'int',
+                        'description' => 'The id of the selected social',
+                        'source' => array('path' => '0'),
+                        'optional' => FALSE,
+                    ),
+                ),
+            ),*/
         )
     );
 }
