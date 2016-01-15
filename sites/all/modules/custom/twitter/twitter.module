@@ -90,3 +90,12 @@ function twitter_get_auth_link() {
     $_SESSION['oauth_token_secret'] = $request_token['oauth_token_secret'];
     return $link;
 }
+
+function twitter_reset($id) {
+    global $user;
+    return db_delete('twitter')
+        ->condition('user_id', $user->uid)
+        ->condition('tid', $id)
+        ->execute();
+    //return 1;
+}

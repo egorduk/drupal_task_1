@@ -1,12 +1,17 @@
 app.SocialViewer = function(){
     var SocialViewer = {};
-    var BookDetailView = Backbone.Marionette.ItemView.extend({
+    /*var BookDetailView = Backbone.Marionette.ItemView.extend({
         template: "#book-detail-template",
         className: "modal bookDetail"
+    });*/
+    var SocialView = Backbone.Marionette.ItemView.extend({
+        template: "#social-template",
+        className: "modal socialDetail"
     });
     var NoticeView = new app.NoticeView();
     var SocialRowView = Backbone.Marionette.ItemView.extend({
-        template: "#item-template",
+        //template: "#item-template",
+        template: _.template($('#item-template').html()),
         tagName: "tr",
         initialize: function() {
             //console.log('SocialRowView: initialize');
@@ -28,7 +33,8 @@ app.SocialViewer = function(){
             var socialSyncLink = (this.model.get("sync_link")) ? this.model.get("sync_link") : '#sync/' + socialName;
             (socialStatus) ?
                 statusCell.html('<span class="status-true"></span>' +
-                    '<a class="view" href="#view/' + socialName + '">View</a> | ' +
+                    '<a class="view">View</a> | ' +
+                    //'<a class="view" href="#view/' + socialName + '">View</a> | ' +
                     //'<a class="reset" href="#reset/' + socialName + '">Reset</a>') :
                     '<a class="reset">Reset</a>') :
                 statusCell.html('<span class="status-false"></span><a href="' + socialSyncLink + '">Sync</a>');
@@ -36,40 +42,37 @@ app.SocialViewer = function(){
         },
         change: function () {
             console.log('SocialRowView: change');
+            //this.render();
         },
         destroy: function() {
             console.log('SocialRowView: destroy');
         },
         onClickReset: function () {
             var self = this;
-            $.ajax({
-                url: "?q=services/session/token",
-                type: "GET",
-                dataType: "text",
-                error: function (jqXHR, textStatus, errorThrown) {
-                    //alert(errorThrown);
-                    NoticeView.setNotice(textStatus, 'error');
-                    self.showNotice();
+            self.model.save({'status': 0}, {
+                success: function (model, response) {
+                    //NoticeView.setNotice(response.responseText, 'success');
+                    //self.showNotice();
+                    console.log('Success: ' + response.result);
+                    if (response.result) {
+                        self.render();
+                    }
+                    //alert('s');
                 },
-                success: function (token) {
-                    self.model.save({'status': 13}, {
-                        success: function (model, response) {
-                            //NoticeView.setNotice(response.responseText, 'success');
-                            //self.showNotice();
-                            console.log(response);
-                            alert('s');
-                        },
-                        error: function (model, response) {
-                            //NoticeView.setNotice(response.responseText, 'error');
-                            //self.showNotice();
-                            console.log(response);
-                            alert('e');
-                        },
-                        wait: true
-                    });
-                    //self.model.save();
-                }
+                error: function (model, response) {
+                    //NoticeView.setNotice(response.responseText, 'error');
+                    //self.showNotice();
+                    console.log('Error: ' + response.result);
+                    //alert('e');
+                },
+                wait: true
             });
+            //self.model.save();
+
+        },
+        onClickView: function() {
+            var socialView = new SocialView();
+            app.modal.show(socialView);
         },
         showNotice: function() {
             app.LibraryApp.layout.noticeContainer.show(NoticeView.render());

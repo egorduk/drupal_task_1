@@ -39,18 +39,22 @@ function main_page_callback() {
                 array('data' => $module_path . '/js/backbone.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/backbone.marionette.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/app.js', 'type' => 'file', 'scope' => 'footer'),
+                array('data' => $module_path . '/js/app_config.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/app_second.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/app_viewer.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/app_routing.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/app_closer.js', 'type' => 'file', 'scope' => 'footer'),
-                array('data' => $module_path . '/js/app_config.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/app_start.js', 'type' => 'file', 'scope' => 'footer')
             ),
-            /*'css' => array(
-                array('data' => $module_path . '/path/to/mybackboneapp.css', 'type' => 'file'),
-            ),*/
+            //'css' => array(
+                //array('data' => $module_path . '/css/style.css', 'type' => 'file', 'scope' => 'footer'),
+                //array($module_path . '/css/style.css'),
+                //$module_path . '/css/style.css'
+            //),
         ),
     );
+    //$content['#attached']['css'][] = $module_path . '/css/style.css';
+    $content['#attached']['css']['.socialDetail {border:1px solid black;width:600px;height:300px;}'] = array( 'type' => 'inline');
     //$layout = "http://localhost/drupal_task_1/" . $module_path . "/layout.tpl";
     //$item = "http://localhost/drupal_task_1/" . $module_path . "/item.tpl";
     $content['#markup'] = '
@@ -91,8 +95,10 @@ function main_page_callback() {
       <div class="books"><%=status%></div>
     </div>
 </script>-->
-<script type="text/template" id="book-detail-template">
+<script type="text/template" id="social-template">
     <a class="close" data-dismiss="modal">x</a>
+    <textarea placeholder="Комментировать"></textarea>
+    <button class="save">Отправить</button>
 </script>
 <script type="text/template" id="layout-template">
     <div id="noticeContainer"></div>
@@ -381,7 +387,7 @@ function main_services_resources() {
                 'file' => array('file' => 'inc', 'module' => 'main'),
                 'callback' => '_main_get_socials',
                 'access arguments' => array('administer site configuration'),
-                'access arguments append' => TRUE,
+               // 'access arguments append' => TRUE,
                 //'args' => array()
                 'args' => array(
                     array(
@@ -404,17 +410,10 @@ function main_services_resources() {
                     array(
                         'name' => 'id',
                         'type' => 'int',
-                        'description' => 'The id of the node to update',
+                        'description' => 'The id of the social to update',
                         'source' => array('path' => '0'),
                         'optional' => FALSE,
-                    ),
-                    array(
-                        'name' => 'data',
-                        'type' => 'struct',
-                        'description' => 'The note data object',
-                        'source' => 'data',
-                        'optional' => FALSE,
-                    ),
+                    )
                 ),
             ),
         )

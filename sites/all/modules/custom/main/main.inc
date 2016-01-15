@@ -20,20 +20,30 @@ function _main_create($data) {
     );
 }
 
-function _main_update($id, $data) {
-    //global $user;
-    /*$note = main_get_note($id);
-    unset($data->created);
-    $data->id = $id;
-    $data->uid = $note->uid;
-    $data->modified = time();
-    main_write_note($data);
-    return (object)array(
-        'id' => $id,
-        'uri' => services_resource_uri(array('note', $id)),
-    );*/
-    return ($id);
-    //var_dump($data);
+function _main_update($id) {
+    if (!isset($id)) {
+        return services_error('Missing id', 406);
+    }
+    $typeSocial = _main_get_type_social_by_id($id);
+    $recordId = _main_parse_social_id($id);
+    return (object)array('result' => _main_reset_social($typeSocial, $recordId));
+    //return true;
+}
+
+function _main_reset_social($typeSocial, $recordId) {
+    if ($typeSocial == 'twitter') {
+        return twitter_reset($recordId);
+    } elseif ($typeSocial = 'facebook') {
+
+    } elseif ($typeSocial = 'instagram') {
+
+    } else {
+
+    }
+}
+
+function _main_parse_social_id($id) {
+    return str_replace($id[0], '', $id);
 }
 
 function _main_retrieve($id) {
@@ -107,4 +117,18 @@ function getInstagramAccount() {
 
 function getFacebookAccount() {
     return facebook_load_by_user();
+}
+
+function _main_get_type_social_by_id($id) {
+    $firstLetter = $id[0];
+    $typeSocial = '';
+    if ($firstLetter == 'i') {
+        $typeSocial = 'instagram';
+    } elseif ($firstLetter == 't') {
+        $typeSocial = 'twitter';
+    } elseif ($firstLetter == 'f') {
+        $typeSocial = 'facebook';
+    } else {
+    }
+    return $typeSocial;
 }

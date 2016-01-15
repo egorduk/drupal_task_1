@@ -8,16 +8,44 @@ app.LibraryApp = function(){
             noticeContainer: "#noticeContainer"
         }
     });
+    var token = '', flOnlyOneRequest = true;
     Backbone.AuthenticatedModel = Backbone.Model.extend({
+        initialize: function(){
+            if (flOnlyOneRequest) {
+                flOnlyOneRequest = false;
+                $.ajax({
+                    url: app.ConfigApp.urlGetSessionToken,
+                    type: "GET",
+                    dataType: "text",
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        //alert(errorThrown);
+                        //NoticeView.setNotice(textStatus, 'error');
+                        //self.showNotice();
+                    },
+                    success: function (response) {
+                        token = response;
+                    }
+                });
+            }
+        },
         sync: function(method, collection, options){
             options = options || {};
-            options.beforeSend = function (xhr) {
-                xhr.setRequestHeader('X-CSRF-Token', ('1LkETChWg2DrUJxzP6RiwMjZoR_UJ3ISlT74vLcv89s'));
+            options.beforeSend = function(xhr) {
+                //token = 'R4hr3lccvEZNIfRHP2I21YqqG_lBBa8w627yLMGresE';
+                xhr.setRequestHeader('X-CSRF-Token', token);
             };
-            return Backbone.sync.call(this,method, collection, options);
+            return Backbone.sync.call(this, method, collection, options);
         }
     });
     //var SocialModel = Backbone.Model.extend({
+    var PostModel = Backbone.Model.extend({
+        urlRoot: '/drupal_task_1/notes/post',
+        defaults: {
+            author: '',
+            content: '',
+            date_post: ''
+        }
+    });
     var SocialModel = Backbone.AuthenticatedModel.extend({
         urlRoot: '/drupal_task_1/notes/social',
         defaults: {}
@@ -120,7 +148,6 @@ app.LibraryApp = function(){
             });
         }
     });
-    //LibraryApp.Books = new Books();
     LibraryApp.SocialCollection = new SocialCollection();
     LibraryApp.initializeLayout = function(){
         LibraryApp.layout = new Layout();
