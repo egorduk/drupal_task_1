@@ -3,7 +3,8 @@ app.ConfigApp = function(){
     ConfigApp.facebookLink = "f";
     ConfigApp.instagramLink = "i";
     ConfigApp.twitterLink = "t";
-    ConfigApp.getSocialAuthLink = function(socialName){
+    ConfigApp.urlGetSessionToken = "?q=services/session/token";
+/*    ConfigApp.getSocialAuthLink = function(socialName){
         var self = this;
         if (socialName == "facebook") {
             return self.facebookLink;
@@ -14,6 +15,6 @@ app.ConfigApp = function(){
         } else {
             return "";
         }
-    };
+    };*/
     return ConfigApp;
 }();

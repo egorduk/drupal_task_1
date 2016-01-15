@@ -15,7 +15,7 @@ var ModalRegion = Backbone.Marionette.Region.extend({
     },
     showModal: function(view){
         view.on("close", this.hideModal, this);
-        this.$el.modal('show');
+        //this.$el.modal('show');
     },
     hideModal: function(){
         this.$el.modal('hide');
@@ -25,7 +25,7 @@ var ModalRegion = Backbone.Marionette.Region.extend({
 app.addRegions({
     menuRegion: '#menu',
     contentRegion: '#content1',
-    //modal: ModalRegion
+    modal: ModalRegion
 });
 /*Backbone.sync = function(method, model) {
     alert(method + ": " + JSON.stringify(model));
