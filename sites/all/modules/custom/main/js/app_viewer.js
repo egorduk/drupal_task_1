@@ -52,7 +52,7 @@ app.SocialViewer = function(){
                     self.showNotice();
                 },
                 success: function (token) {
-                    self.model.save({'status': 13}, {
+                    self.model.save({'status': 0}, {
                         success: function (model, response) {
                             //NoticeView.setNotice(response.responseText, 'success');
                             //self.showNotice();
