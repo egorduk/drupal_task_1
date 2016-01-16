@@ -81,3 +81,32 @@ function instagram_load_by_user() {
         ->condition('user_id', $user->uid);
     return $query->execute()->fetchField();
 }
+
+function instagram_get_posts($id) {
+    global $user;
+    $instagramAccessToken = db_select('instagram', 'inst')
+        ->fields('inst', array('access_token'))
+        ->condition('user_id', $user->uid)
+        ->execute()
+        ->fetchField();
+    //var_dump($instagramData);die;
+    $module_path = drupal_get_path('module', 'instagram');
+    require_once $module_path . '/Instagram/src/Instagram.php';
+    $instagram = new Instagram(array(
+        'apiKey'      => INSTAGRAM_ID,
+        'apiSecret'   => INSTAGRAM_SECRET,
+        'apiCallback' => INSTAGRAM_CALLBACK
+    ));
+    $instagram->setAccessToken($instagramAccessToken);
+    $posts = $instagram->getUserMedia();
+    $parsedPosts = [];
+    foreach($posts->data as $index => $post) {
+        $text = isset($post->caption->text) ? $post->caption->text : '';
+        $parsedPosts[$index]['date_post'] = $post->created_time;
+        $parsedPosts[$index]['content'] = $post->images->standard_resolution->url . ' - ' . $text;
+        $parsedPosts[$index]['author'] = $post->user->username . ' - ' . $post->user->full_name;
+        //$parsedPosts[$index]['author'] = $post;
+    }
+    return $parsedPosts;
+    //var_dump($posts);die;
+}

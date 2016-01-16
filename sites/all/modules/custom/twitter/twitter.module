@@ -3,9 +3,9 @@
 require "twitter_api/autoload.php";
 use Abraham\TwitterOAuth\TwitterOAuth;
 
-define("CONSUMER_KEY", "Jt4lGWjVOJqvUalFyv911Dbkr");
-define("CONSUMER_SECRET", "LU32tiMn5NmCHzlfMTgFrmJjnPXsaaAfqQNTefdnoR1e3pcXqo");
-define("OAUTH_CALLBACK", "http://localhost/drupal_task_1/user/test?social=twitter");
+define("TWITTER_CONSUMER_KEY", "Jt4lGWjVOJqvUalFyv911Dbkr");
+define("TWITTER_CONSUMER_SECRET", "LU32tiMn5NmCHzlfMTgFrmJjnPXsaaAfqQNTefdnoR1e3pcXqo");
+define("TWITTER_OAUTH_CALLBACK", "http://localhost/drupal_task_1/user/test?social=twitter");
 
 function twitter_entity_info() {
     $return = array(
@@ -83,8 +83,8 @@ function twitter_load_by_user() {
 }
 
 function twitter_get_auth_link() {
-    $connection = new TwitterOAuth(CONSUMER_KEY, CONSUMER_SECRET);
-    $request_token = $connection->oauth('oauth/request_token', array('oauth_callback' => OAUTH_CALLBACK));
+    $connection = new TwitterOAuth(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET);
+    $request_token = $connection->oauth('oauth/request_token', array('oauth_callback' => TWITTER_OAUTH_CALLBACK));
     $link = $connection->url('oauth/authorize', array('oauth_token' => $request_token['oauth_token']));
     $_SESSION['oauth_token'] = $request_token['oauth_token'];
     $_SESSION['oauth_token_secret'] = $request_token['oauth_token_secret'];
@@ -103,8 +103,18 @@ function twitter_reset($id) {
 function twitter_get_posts($id) {
     global $user;
     $twitterData = db_select('twitter', 'tw')
-        ->fields('tw', array('tid'))
+        ->fields('tw', array('oauth_token', 'oauth_token_secret'))
         ->condition('user_id', $user->uid)
         ->execute()
-        ->fetchAssoc();
+        ->fetchObject();
+    $connection = new TwitterOAuth(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, $twitterData->oauth_token, $twitterData->oauth_token_secret);
+    $actualTwits = $connection->get("statuses/user_timeline");
+    $parsedActualTwits = [];
+    foreach($actualTwits as $index => $actualTwit) {
+        $parsedActualTwits[$index]['date_post'] = $actualTwit->created_at;
+        $parsedActualTwits[$index]['content'] = $actualTwit->text;
+        $parsedActualTwits[$index]['author'] = $actualTwit->user->name . ' - @' . $actualTwit->user->screen_name;
+    }
+    //var_dump($parsedActualTwits);die;
+    return $parsedActualTwits;
 }

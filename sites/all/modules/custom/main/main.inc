@@ -107,28 +107,29 @@ function _main_get_socials($mode) {
     return 'Error';
 }
 
-function _main_get_posts($id) {
-   // if ($mode == 'get_posts') {
+function _main_get_posts($mode, $id) {
+    if ($mode == 'get_posts') {
         //$arr = [];
-        $arr = _main_get_social_posts($id);
+        $posts = _main_get_social_posts($id);
         //$arr[] = array('author' => 'author1', 'content' => 'content1', 'date_post' => '11-11-2015', 'uid' => '1');
         //$arr[] = array('author' => 'author2', 'content' => 'content2', 'date_post' => '12-12-2012', 'uid' => '2');
         //$arr[] = array('author' => 'author3', 'content' => 'content3', 'date_post' => '01-01-2016', 'uid' => '3');
-        return ($arr);
-  //  }
-  //  return 'Error';
+        return $posts;
+    }
+    return 'Error';
 }
 
 function _main_get_social_posts($id) {
     //global $user;
     $arr = [];
     $typeSocial = _main_get_type_social_by_id($id);
+    //var_dump($typeSocial);die;
     if ($typeSocial == 'twitter') {
         return twitter_get_posts($id);
-    } elseif ($typeSocial = 'facebook') {
-
-    } elseif ($typeSocial = 'instagram') {
-
+    } elseif ($typeSocial == 'facebook') {
+        //return twitter_get_posts($id);
+    } elseif ($typeSocial == 'instagram') {
+        return instagram_get_posts($id);
     } else {
 
     }

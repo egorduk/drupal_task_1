@@ -50,10 +50,13 @@ app.LibraryApp = function(){
         model: PostModel,
         //comparator: 'name',
         //url: '/drupal_task_1/notes/post/get_posts.json',
-        url: '/drupal_task_1/notes/post/get_posts.json',
-        initialize: function() {
+        url: function(){
+            return '/drupal_task_1/notes/post/get_posts/' + this.socialId + '.json';
+        },
+        initialize: function(models, options) {
             console.log('PostCollection: initialize');
             var self = this;
+            this.socialId = options.socialId;
             app.vent.on("post:getPosts", function(){
                 self.fetchPosts();
             });
@@ -169,7 +172,7 @@ app.LibraryApp = function(){
         }
     });
     LibraryApp.SocialCollection = new SocialCollection();
-    LibraryApp.PostCollection = new PostCollection();
+    LibraryApp.PostCollection = new PostCollection(null, {socialId: 'i'});
     LibraryApp.initializeLayout = function(){
         LibraryApp.layout = new Layout();
         LibraryApp.layout.on("show", function(){
