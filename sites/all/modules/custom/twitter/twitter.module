@@ -100,7 +100,7 @@ function twitter_reset($id) {
     //return 1;
 }
 
-function twitter_get_posts($id) {
+function twitter_get_posts() {
     global $user;
     $twitterData = db_select('twitter', 'tw')
         ->fields('tw', array('oauth_token', 'oauth_token_secret'))

@@ -82,7 +82,7 @@ function instagram_load_by_user() {
     return $query->execute()->fetchField();
 }
 
-function instagram_get_posts($id) {
+function instagram_get_posts() {
     global $user;
     $instagramAccessToken = db_select('instagram', 'inst')
         ->fields('inst', array('access_token'))

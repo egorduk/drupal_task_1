@@ -172,7 +172,7 @@ app.LibraryApp = function(){
         }
     });
     LibraryApp.SocialCollection = new SocialCollection();
-    LibraryApp.PostCollection = new PostCollection(null, {socialId: 'i'});
+    LibraryApp.PostCollection = new PostCollection(null, {socialId: 'f'});
     LibraryApp.initializeLayout = function(){
         LibraryApp.layout = new Layout();
         LibraryApp.layout.on("show", function(){

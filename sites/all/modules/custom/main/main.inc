@@ -125,11 +125,11 @@ function _main_get_social_posts($id) {
     $typeSocial = _main_get_type_social_by_id($id);
     //var_dump($typeSocial);die;
     if ($typeSocial == 'twitter') {
-        return twitter_get_posts($id);
+        return twitter_get_posts();
     } elseif ($typeSocial == 'facebook') {
-        //return twitter_get_posts($id);
+        return facebook_get_posts();
     } elseif ($typeSocial == 'instagram') {
-        return instagram_get_posts($id);
+        return instagram_get_posts();
     } else {
 
     }

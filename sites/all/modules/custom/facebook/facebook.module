@@ -80,3 +80,28 @@ function facebook_get_auth_link() {
     );
     return $url . '?' . urldecode(http_build_query($params));
 }
+
+function facebook_get_posts() {
+    global $user;
+    $facebookAccessToken = db_select('facebook', 'fb')
+        ->fields('fb', array('access_token'))
+        ->condition('user_id', $user->uid)
+        ->execute()
+        ->fetchField();
+    $params = array('access_token' => $facebookAccessToken);
+    //var_dump($params);die;
+    $feeds = json_decode(file_get_contents('https://graph.facebook.com/me/feed' . '?' . urldecode(http_build_query($params))), true);
+    //$feeds = json_decode(file_get_contents('https://graph.facebook.com/me' . '?' . urldecode(http_build_query($params))), true);
+
+   /* $posts = $instagram->getUserMedia();
+    $parsedPosts = [];
+    foreach($posts->data as $index => $post) {
+        $text = isset($post->caption->text) ? $post->caption->text : '';
+        $parsedPosts[$index]['date_post'] = $post->created_time;
+        $parsedPosts[$index]['content'] = $post->images->standard_resolution->url . ' - ' . $text;
+        $parsedPosts[$index]['author'] = $post->user->username . ' - ' . $post->user->full_name;
+        //$parsedPosts[$index]['author'] = $post;
+    }
+    return $parsedPosts;*/
+    var_dump($feeds);die;
+}
