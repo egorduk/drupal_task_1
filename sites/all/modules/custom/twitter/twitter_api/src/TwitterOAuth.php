@@ -135,10 +135,10 @@ class TwitterOAuth extends Config
         if ($this->getLastHttpCode() == 200) {
             parse_str($result, $response);
             $this->response->setBody($response);
-
             return $response;
         } else {
-            throw new TwitterOAuthException($result);
+            //throw new TwitterOAuthException($result);
+            return false;
         }
     }
 

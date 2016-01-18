@@ -7,7 +7,7 @@ if (isset($_REQUEST['social']) && $_REQUEST['social'] == 'twitter' && isset($_RE
     $request_token = [];
     $request_token['oauth_token'] = $_SESSION['oauth_token'];
     $request_token['oauth_token_secret'] = $_SESSION['oauth_token_secret'];
-    $connection = new \Abraham\TwitterOAuth\TwitterOAuth(CONSUMER_KEY, CONSUMER_SECRET, $request_token['oauth_token'], $request_token['oauth_token_secret']);
+    $connection = new \Abraham\TwitterOAuth\TwitterOAuth(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, $request_token['oauth_token'], $request_token['oauth_token_secret']);
     $access_token = $connection->oauth("oauth/access_token", array("oauth_verifier" => $_REQUEST['oauth_verifier']));
     $arrayData['oauth_token'] = $access_token['oauth_token'];
     $arrayData['oauth_token_secret'] = $access_token['oauth_token_secret'];
@@ -40,6 +40,15 @@ if (isset($_REQUEST['social']) && $_REQUEST['social'] == 'twitter' && isset($_RE
     $url = 'https://graph.facebook.com/oauth/access_token';
     $tokenInfo = null;
     parse_str(file_get_contents($url . '?' . http_build_query($params)), $tokenInfo);
+    /*$module_path = drupal_get_path('module', 'facebook');
+    require_once $module_path . '/FacebookHelper.php';
+    $a = new FacebookHelper();
+    $postvals = "client_id=" . FACEBOOK_APP_ID
+        ."&client_secret=" . FACEBOOK_APP_SECRET
+        //."&grant_type=authorization_code"
+        ."&redirect_uri=" . urlencode(FACEBOOK_APP_REDIRECT_URL)
+        ."&code=" . $_REQUEST['code'];
+    var_dump($a->curlRequest('https://graph.facebook.com/oauth/access_token', 'POST', $postvals));die;*/
     if (count($tokenInfo) > 0 && isset($tokenInfo['access_token'])) {
         $params = array('access_token' => $tokenInfo['access_token']);
         $arrayData['access_token'] = $tokenInfo['access_token'];

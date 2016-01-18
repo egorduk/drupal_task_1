@@ -3,7 +3,6 @@ app.LibraryApp = function(){
     var Layout = Backbone.Marionette.LayoutView.extend({
         template: "#layout-template",
         regions: {
-            search: "#searchBar",
             mainContainer: "#mainContainer",
             noticeContainer: "#noticeContainer",
             modalContainer: '#modalContainer'
@@ -15,7 +14,7 @@ app.LibraryApp = function(){
             if (flOnlyOneRequest) {
                 flOnlyOneRequest = false;
                 $.ajax({
-                    url: app.ConfigApp.urlGetSessionToken,
+                    url: app.ConfigApp.urlSessionToken,
                     type: "GET",
                     dataType: "text",
                     error: function (jqXHR, textStatus, errorThrown) {
@@ -38,25 +37,24 @@ app.LibraryApp = function(){
             return Backbone.sync.call(this, method, collection, options);
         }
     });
-    var PostModel = Backbone.Model.extend({
-        urlRoot: '/drupal_task_1/notes/post',
+    var PostModel = Backbone.AuthenticatedModel.extend({
+        urlRoot: app.ConfigApp.urlPost,
         defaults: {
-           /* author: '',
             content: '',
-            date_post: ''*/
+            date_post: '',
+            social_name: ''
         }
     });
     var PostCollection = Backbone.Collection.extend({
         model: PostModel,
-        //comparator: 'name',
-        //url: '/drupal_task_1/notes/post/get_posts.json',
+        socialName: '',
         url: function(){
-            return '/drupal_task_1/notes/post/get_posts/' + this.socialId + '.json';
+            return app.ConfigApp.urlGetPosts + this.socialName + '.json';
         },
         initialize: function(models, options) {
             console.log('PostCollection: initialize');
             var self = this;
-            this.socialId = options.socialId;
+            this.socialName = options.socialName;
             app.vent.on("post:getPosts", function(){
                 self.fetchPosts();
             });
@@ -64,19 +62,17 @@ app.LibraryApp = function(){
         fetchPosts: function() {
             this.fetch({}).fail(function(){}).done(function(a) {
                 console.log(a);
-                //callback(a);
-                //return a;
             });
         }
     });
     var SocialModel = Backbone.AuthenticatedModel.extend({
-        urlRoot: '/drupal_task_1/notes/social',
+        urlRoot: app.ConfigApp.urlSocial,
         defaults: {}
     });
     var SocialCollection = Backbone.Collection.extend({
         model: SocialModel,
         //comparator: 'name',
-        url: '/drupal_task_1/notes/social/get_socials.json',
+        url: app.ConfigApp.urlGetSocials,
         initialize: function() {
             console.log('SocialCollection: initialize');
             var self = this;
@@ -85,110 +81,23 @@ app.LibraryApp = function(){
             });
         },
         fetchSocials: function() {
-            this.fetch({}).fail(function(){}).done(function(a) {
-                console.log(a);
-                //callback(a);
-                //return a;
-            });
-        }
-    });
-    var Book = Backbone.Model.extend();
-    var Books = Backbone.Collection.extend({
-        model: Book,
-        initialize: function(){
-            var self = this;
-            _.bindAll(this, "search", "moreBooks");
-            app.vent.on("search:term", function(term){ self.search(term); });
-            app.vent.on("search:more", function(){ self.moreBooks(); });
-            // the number of books we fetch each time
-            this.maxResults = 40;
-            // the results "page" we last fetched
-            this.page = 0;
-            // flags whether the collection is currently in the process of fetching
-            // more results from the API (to avoid multiple simultaneous calls
-            this.loading = false;
-            // the maximum number of results for the previous search
-            this.totalItems = null;
-        },
-        search: function(searchTerm) {
-            this.page = 0;
-            var self = this;
-            this.fetchBooks(searchTerm, function(books) {
-                (books.length < 1) ? app.vent.trigger("search:noResults") : self.reset(books);
-            });
-        },
-        moreBooks: function(){
-            // if we've loaded all the books for this search, there are no more to load !
-            if(this.length >= this.totalItems){
-                return true;
-            }
-            var self = this;
-            this.fetchBooks(this.previousSearch, function(books){ self.add(books); });
-        },
-        fetchBooks: function(searchTerm, callback) {
-            if (this.loading) {
-                return true;
-            }
-            this.loading = true;
-            var self = this;
-            app.vent.trigger("search:start");
-            var query = encodeURIComponent(searchTerm)+'&maxResults='+this.maxResults+'&startIndex='+(this.page * this.maxResults)+'&fields=totalItems,items(id,volumeInfo/title,volumeInfo/subtitle,volumeInfo/authors,volumeInfo/publishedDate,volumeInfo/description,volumeInfo/imageLinks)';
-            $.ajax({
-                url: 'https://www.googleapis.com/books/v1/volumes',
-                dataType: 'json',
-                data: 'q='+query,
-                success: function(res) {
-                    app.vent.trigger("search:stop");
-                    if (res.totalItems == 0) {
-                        callback([]);
-                        return [];
-                    }
-                    if (res.items) {
-                        self.page++;
-                        self.totalItems = res.totalItems;
-                        var searchResults = [];
-                        _.each(res.items, function(item){
-                            var thumbnail = null;
-                            if(item.volumeInfo && item.volumeInfo.imageLinks && item.volumeInfo.imageLinks.thumbnail){
-                                thumbnail = item.volumeInfo.imageLinks.thumbnail;
-                            }
-                            searchResults[searchResults.length] = new Book({
-                                thumbnail: thumbnail,
-                                title: item.volumeInfo.title,
-                                subtitle: item.volumeInfo.subtitle,
-                                description: item.volumeInfo.description,
-                                googleId: item.id
-                            });
-                        });
-                        callback(searchResults);
-                        self.loading = false;
-                        return searchResults;
-                    } else if (res.error) {
-                        app.vent.trigger("search:error");
-                        self.loading = false;
-                    }
-                }
+            this.fetch({}).fail(function(){}).done(function(data) {
+                console.log(data);
+                _(data).each(function(item) {
+                    app.SessionHelper.setItem("status:" + item.name, item.status);
+                });
             });
         }
     });
     LibraryApp.SocialCollection = new SocialCollection();
-    LibraryApp.PostCollection = new PostCollection(null, {socialId: 'f'});
     LibraryApp.initializeLayout = function(){
         LibraryApp.layout = new Layout();
         LibraryApp.layout.on("show", function(){
-            app.vent.trigger("layout: rendered");
+            app.vent.trigger("Layout: rendered");
         });
         app.contentRegion.show(app.LibraryApp.layout);
     };
-    //LibraryApp.search = function(term){
-    LibraryApp.search = function() {
-        LibraryApp.initializeLayout();
-        app.SocialViewer.showTableSocial(LibraryApp.SocialCollection);
-        app.vent.trigger("social:getSocials");
-        //console.log(LibraryApp.SocialCollection);
-        //Backbone.history.navigate("main");
-        //console.log("Current fragment: " + Backbone.history.getFragment());
-    };
+    LibraryApp.PostModel = PostModel;
     LibraryApp.home = function() {
         /*var parsedArrayUrl = LibraryApp.parseUrl();
         if (parsedArrayUrl['social'] == 'twitter') {
@@ -199,22 +108,29 @@ app.LibraryApp = function(){
         } else if (parsedArrayUrl['social'] == 'facebook') {
             app.vent.trigger("social:authSuccess:facebook");
         }*/
-        this.search();
+        LibraryApp.initializeLayout();
+        app.SocialViewer.showTableSocial(LibraryApp.SocialCollection);
+        app.vent.trigger("social:getSocials");
     };
     LibraryApp.viewSocial = function(socialName){
-        console.log("view " + socialName);
+        //console.log("view " + socialName);
+        //console.log("Current fragment: " + Backbone.history.getFragment());
+        var sessionSocialStatus = app.SessionHelper.getItem("status:" + socialName);
+        if (sessionSocialStatus === "false" || sessionSocialStatus == "null" || $.inArray(socialName, app.ConfigApp.socialArray) == -1) {
+            Backbone.history.navigate("");
+            return;
+        }
         LibraryApp.initializeLayout();
-        app.SocialViewer.showSocialDetails(LibraryApp.PostCollection);
+        LibraryApp.PostCollection = new PostCollection(null, {socialName: socialName});
+        app.SocialViewer.showSocialDetails(LibraryApp.PostCollection, socialName);
         app.vent.trigger("post:getPosts");
-        //console.log(LibraryApp.PostCollection);
-
     };
     /*LibraryApp.resetSocial = function(socialName){
         console.log("reset " + socialName);
-    };*/
+    };
     LibraryApp.syncSocial = function(socialName){
         console.log("sync " + socialName);
-    };
+    };*/
     LibraryApp.parseUrl = function() {
         var params = [],
             queryString = window.location.href,

@@ -102,11 +102,17 @@ function instagram_get_posts() {
     $parsedPosts = [];
     foreach($posts->data as $index => $post) {
         $text = isset($post->caption->text) ? $post->caption->text : '';
-        $parsedPosts[$index]['date_post'] = $post->created_time;
+        $parsedPosts[$index]['date_post'] = date('d/m/Y', $post->created_time);
         $parsedPosts[$index]['content'] = $post->images->standard_resolution->url . ' - ' . $text;
         $parsedPosts[$index]['author'] = $post->user->username . ' - ' . $post->user->full_name;
-        //$parsedPosts[$index]['author'] = $post;
     }
     return $parsedPosts;
-    //var_dump($posts);die;
+}
+
+function instagram_reset($id) {
+    global $user;
+    return db_delete('instagram')
+        ->condition('user_id', $user->uid)
+        ->condition('iid', $id)
+        ->execute();
 }

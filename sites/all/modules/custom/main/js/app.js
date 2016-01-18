@@ -42,7 +42,7 @@ app.MenuView = Backbone.Marionette.View.extend({
     showMainPage: function(e) {
         e.preventDefault();
         //alert('main');
-        app.LibraryApp.search();
+        app.LibraryApp.home();
     },
     showFeedsPage: function(e) {
         e.preventDefault();
@@ -78,9 +78,13 @@ app.vent.on("layout: rendered", function(){
     app.menuRegion.attachView(menu);
 });
 app.vent.on("routing: started", function(){
+    app.SessionHelper = window.sessionStorage;
     console.log("routing:started");
     if (!Backbone.History.started) {
         Backbone.history.start();
+    }
+    if (typeof(app.SessionHelper) === "undefined") {
+        alert('No Web Storage support');
     }
 });
 

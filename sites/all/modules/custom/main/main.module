@@ -46,6 +46,9 @@ function main_page_callback() {
                 array('data' => $module_path . '/js/app_closer.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/app_start.js', 'type' => 'file', 'scope' => 'footer')
             ),
+            'css' => array(
+                array('data' => $module_path . '/css/style.css', 'type' => 'file'),
+            ),
             //'css' => array(
                 //array('data' => $module_path . '/css/style.css', 'type' => 'file', 'scope' => 'footer'),
                 //array($module_path . '/css/style.css'),
@@ -54,7 +57,7 @@ function main_page_callback() {
         ),
     );
     //$content['#attached']['css'][] = $module_path . '/css/style.css';
-    $content['#attached']['css']['.socialDetail {border:1px solid black;width:600px;height:auto;}'] = array( 'type' => 'inline');
+    $content['#attached']['css']['.socialDetail {border:1px solid black;width:600px;height:auto} .post-detail {border: 1px solid black;}'] = array( 'type' => 'inline');
     //$layout = "http://localhost/drupal_task_1/" . $module_path . "/layout.tpl";
     //$item = "http://localhost/drupal_task_1/" . $module_path . "/item.tpl";
     $content['#markup'] = '
@@ -118,15 +121,17 @@ function main_page_callback() {
 </script>
 <script type="text/template" id="social-item-template">
     <div class="post-detail">
-        <div class="author"><%=author%></div>
         <div class="content"><%=content%></div>
         <div class="date_post"><%=date_post%></div>
     </div>
 </script>
 <script type="text/template" id="social-list-template">
     <a class="close" data-dismiss="modal" href="#">x</a>
-    <textarea placeholder="Комментировать"></textarea>
-    <button class="save">Отправить</button>
+    <div class="user_name"></div>
+    <div class="panel-new-post">
+        <textarea placeholder="Комментировать" class="text-new-post"></textarea>
+        <button class="add-new-post">Отправить</button>
+    </div>
 </script>
 
 
@@ -440,10 +445,26 @@ function main_services_resources() {
                         'optional' => FALSE,
                     ),
                     array(
-                        'name' => 'id',
+                        'name' => 'typeSocial',
                         'type' => 'string',
-                        'description' => 'The id of the selected social',
+                        'description' => 'The name of the selected social',
                         'source' => array('path' => '1'),
+                        'optional' => FALSE,
+                    ),
+                ),
+            ),
+            'create' => array(
+                'help' => 'Creates new post',
+                'file' => array('file' => 'inc', 'module' => 'main'),
+                'callback' => '_main_public_post',
+                'access arguments' => array('administer site configuration'),
+                //'access arguments append' => FALSE,
+                'args' => array(
+                    array(
+                        'name' => 'data',
+                        'type' => 'struct',
+                        'description' => 'Post data',
+                        'source' => 'data',
                         'optional' => FALSE,
                     ),
                 ),

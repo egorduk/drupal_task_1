@@ -1,8 +1,12 @@
 <?php
 
-define("FACEBOOK_APP_ID", "1035129189845262");
-define("FACEBOOK_APP_SECRET", "1e121667b64b99f97148211d7df38a60");
+//define("FACEBOOK_APP_ID", "1035129189845262");
+define("FACEBOOK_APP_ID", "1640010319548174");
+//define("FACEBOOK_APP_SECRET", "1e121667b64b99f97148211d7df38a60");
+define("FACEBOOK_APP_SECRET", "7d64b5c69e9b6759bf781fb4a4868622");
 define("FACEBOOK_APP_REDIRECT_URL", "http://localhost/drupal_task_1/user/test?social=facebook");
+define("FACEBOOK_DIALOG_URL", "https://www.facebook.com/dialog/oauth");
+define("FACEBOOK_FEED", "https://graph.facebook.com/me/feed");
 
 function facebook_entity_info() {
     $return = array(
@@ -71,14 +75,13 @@ function facebook_load_by_user() {
 }
 
 function facebook_get_auth_link() {
-    $url = 'https://www.facebook.com/dialog/oauth';
     $params = array(
         'client_id'     => FACEBOOK_APP_ID,
         'redirect_uri'  => FACEBOOK_APP_REDIRECT_URL,
         'response_type' => 'code',
-        'scope'         => 'publish_actions,user_posts'
+        'scope'         => 'publish_actions, user_posts'
     );
-    return $url . '?' . urldecode(http_build_query($params));
+    return FACEBOOK_DIALOG_URL . '?' . urldecode(http_build_query($params));
 }
 
 function facebook_get_posts() {
@@ -89,19 +92,36 @@ function facebook_get_posts() {
         ->execute()
         ->fetchField();
     $params = array('access_token' => $facebookAccessToken);
-    //var_dump($params);die;
-    $feeds = json_decode(file_get_contents('https://graph.facebook.com/me/feed' . '?' . urldecode(http_build_query($params))), true);
-    //$feeds = json_decode(file_get_contents('https://graph.facebook.com/me' . '?' . urldecode(http_build_query($params))), true);
-
-   /* $posts = $instagram->getUserMedia();
-    $parsedPosts = [];
-    foreach($posts->data as $index => $post) {
-        $text = isset($post->caption->text) ? $post->caption->text : '';
-        $parsedPosts[$index]['date_post'] = $post->created_time;
-        $parsedPosts[$index]['content'] = $post->images->standard_resolution->url . ' - ' . $text;
-        $parsedPosts[$index]['author'] = $post->user->username . ' - ' . $post->user->full_name;
-        //$parsedPosts[$index]['author'] = $post;
+    $feeds = json_decode(file_get_contents(FACEBOOK_FEED . '?' . urldecode(http_build_query($params))), true);
+    /*$parsedFeeds = [];
+    foreach($feeds->data as $index => $feed) {
+        $text = isset($feed->message) ? $feed->message : $feed->story;
+        $parsedFeeds[$index]['date_post'] = date('d/m/Y', $feed->created_time);
+        $parsedFeeds[$index]['content'] = $text;
+        $parsedFeeds[$index]['author'] = '';
     }
-    return $parsedPosts;*/
+    return $parsedFeeds;*/
     var_dump($feeds);die;
+}
+
+function facebook_public_post($data) {
+    global $user;
+    $facebookAccessToken = db_select('facebook', 'fb')
+        ->fields('fb', array('access_token'))
+        ->condition('user_id', $user->uid)
+        ->execute()
+        ->fetchField();
+    $params = array('access_token' => $facebookAccessToken);
+    $module_path = drupal_get_path('module', 'facebook');
+    require_once $module_path . '/FacebookHelper.php';
+    $a = new FacebookHelper();
+    var_dump($a->curlRequest(FACEBOOK_FEED . '?message=test&access_token=' . urldecode(http_build_query($params)), 'POST'));
+}
+
+function facebook_reset($id) {
+    global $user;
+    return db_delete('facebook')
+        ->condition('user_id', $user->uid)
+        ->condition('fid', $id)
+        ->execute();
 }

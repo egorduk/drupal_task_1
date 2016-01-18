@@ -33,10 +33,10 @@ function _main_update($id) {
 function _main_reset_social($typeSocial, $recordId) {
     if ($typeSocial == 'twitter') {
         return twitter_reset($recordId);
-    } elseif ($typeSocial = 'facebook') {
-
-    } elseif ($typeSocial = 'instagram') {
-
+    } elseif ($typeSocial == 'facebook') {
+        return facebook_reset($recordId);
+    } elseif ($typeSocial == 'instagram') {
+        return instagram_reset($recordId);
     } else {
 
     }
@@ -107,23 +107,16 @@ function _main_get_socials($mode) {
     return 'Error';
 }
 
-function _main_get_posts($mode, $id) {
+function _main_get_posts($mode, $typeSocial) {
     if ($mode == 'get_posts') {
-        //$arr = [];
-        $posts = _main_get_social_posts($id);
-        //$arr[] = array('author' => 'author1', 'content' => 'content1', 'date_post' => '11-11-2015', 'uid' => '1');
-        //$arr[] = array('author' => 'author2', 'content' => 'content2', 'date_post' => '12-12-2012', 'uid' => '2');
-        //$arr[] = array('author' => 'author3', 'content' => 'content3', 'date_post' => '01-01-2016', 'uid' => '3');
+        $posts = _main_get_social_posts($typeSocial);
         return $posts;
     }
     return 'Error';
 }
 
-function _main_get_social_posts($id) {
-    //global $user;
+function _main_get_social_posts($typeSocial) {
     $arr = [];
-    $typeSocial = _main_get_type_social_by_id($id);
-    //var_dump($typeSocial);die;
     if ($typeSocial == 'twitter') {
         return twitter_get_posts();
     } elseif ($typeSocial == 'facebook') {
@@ -160,4 +153,26 @@ function _main_get_type_social_by_id($id) {
     } else {
     }
     return $typeSocial;
+}
+
+function _main_public_post($data) {
+    //var_dump($data);
+    if (isset($data) &&  is_array($data)) {
+        $data = (object)$data;
+    }
+    if (!isset($data->content) || !isset($data->date_post) || !isset($data->social_name)) {
+        return services_error('Missing attribute', 406);
+    }
+    //$typeSocial = _main_get_type_social_by_id($data->id);
+    $typeSocial = $data->social_name;
+    if ($typeSocial == 'twitter') {
+        return twitter_public_post($data);
+    } elseif ($typeSocial == 'facebook') {
+        return facebook_public_post($data);
+    } elseif ($typeSocial == 'instagram') {
+        //return instagram_get_posts();
+    } else {
+
+    }
+    return true;
 }

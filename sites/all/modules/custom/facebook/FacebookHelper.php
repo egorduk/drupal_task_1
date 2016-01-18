@@ -73,7 +73,7 @@ class FacebookHelper {
         echo "</pre>";
     }
 
-    public function curlRequest($url,$method,$postvals) {
+    public function curlRequest($url, $method, $postvals = null) {
         $ch = curl_init($url);
         if ($method == "POST") {
             $options = array(

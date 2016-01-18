@@ -108,13 +108,31 @@ function twitter_get_posts() {
         ->execute()
         ->fetchObject();
     $connection = new TwitterOAuth(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, $twitterData->oauth_token, $twitterData->oauth_token_secret);
-    $actualTwits = $connection->get("statuses/user_timeline");
+    $twits = $connection->get("statuses/user_timeline");
     $parsedActualTwits = [];
-    foreach($actualTwits as $index => $actualTwit) {
-        $parsedActualTwits[$index]['date_post'] = $actualTwit->created_at;
-        $parsedActualTwits[$index]['content'] = $actualTwit->text;
-        $parsedActualTwits[$index]['author'] = $actualTwit->user->name . ' - @' . $actualTwit->user->screen_name;
+    foreach($twits as $index => $twit) {
+        $date = new DateTime($twit->created_at);
+        $formattedDate = $date->format('d/m/Y');
+        $parsedActualTwits[$index]['date_post'] = $formattedDate;
+        $parsedActualTwits[$index]['content'] = $twit->text;
     }
     //var_dump($parsedActualTwits);die;
     return $parsedActualTwits;
+}
+
+function twitter_public_post($data) {
+    global $user;
+    $twitterData = db_select('twitter', 'tw')
+        ->fields('tw', array('oauth_token', 'oauth_token_secret'))
+        ->condition('user_id', $user->uid)
+        ->execute()
+        ->fetchObject();
+    $connection = new TwitterOAuth(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, $twitterData->oauth_token, $twitterData->oauth_token_secret);
+    $connection->post('statuses/update', array('status' => $data->content));
+    if ($connection->getLastHttpCode() == 200) {
+        return true;
+    } else {
+        return $connection->getLastHttpCode();
+    }
+    //return true;
 }

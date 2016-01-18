@@ -19,6 +19,6 @@ class Instagram extends Entity {
         return '';
     }
     protected function defaultUri() {
-        return array('path' => 'twitter/' . $this->identifier());
+        return array('path' => 'instagram/' . $this->identifier());
     }
 }

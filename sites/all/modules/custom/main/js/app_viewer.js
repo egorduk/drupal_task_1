@@ -1,9 +1,5 @@
 app.SocialViewer = function(){
     var SocialViewer = {};
-    /*var BookDetailView = Backbone.Marionette.ItemView.extend({
-        template: "#book-detail-template",
-        className: "modal bookDetail"
-    });*/
     var SocialDetailItemView = Backbone.Marionette.ItemView.extend({
         template: "#social-item-template",
         initialize: function(){
@@ -17,11 +13,50 @@ app.SocialViewer = function(){
         template: "#social-list-template",
         className: "modal socialDetail",
         childView: SocialDetailItemView,
+        events: {
+            'click .add-new-post': 'onClickAdd'
+        },
+        onClickAdd: function() {
+            var textareaEl = this.$el.find('textarea'),
+                postText = textareaEl.val(),
+                self = this;
+            if (postText.length <= 3) {
+                NoticeView.setNotice('Too little message (need more then 3 letters)', 'warning');
+                self.showNotice();
+                return;
+            }
+            var post = new app.LibraryApp.PostModel({
+                content: postText,
+                date_post: new Date().getCurrentFormatedDate(),
+                author: '',
+                social_name: app.LibraryApp.PostCollection.socialName
+            });
+            textareaEl.val("");
+            //cm.navToDiv('cm-item-' + model.id);
+            post.save({}, {
+                success: function (model, response) {
+                    console.log("Success", response);
+                    app.LibraryApp.PostCollection.add(model, {at: 0});
+                    //console.log(app.LibraryApp.PostCollection);
+                    //cm.navToDiv('cm-item-' + model.id);
+                },
+                error: function (model, response) {
+                    console.log("Error", response);
+                }
+            });
+        },
         initialize: function(){
             //console.log('SocialDetailListView: initialize');
         },
         onRender: function() {
-           // console.log('SocialDetailListView: onRender');
+            //console.log('SocialDetailListView: onRender');
+        },
+        hidePostPanel: function(socialName) {
+            var panelNewPost = this.$el.find('.panel-new-post');
+            (socialName === 'instagram') ? panelNewPost.hide() : panelNewPost.show();
+        },
+        showNotice: function() {
+            app.LibraryApp.layout.noticeContainer.show(NoticeView.render());
         }
     });
     var NoticeView = new app.NoticeView();
@@ -35,56 +70,50 @@ app.SocialViewer = function(){
             this.listenTo(this.model, 'destroy', this.destroy);
         },
         events: {
-            'click .reset': 'onClickReset',
-            //'click .view': 'onClickView'
+            'click .reset': 'onClickReset'
         },
         /*showBookDetail: function(){
             var detailView = new BookDetailView({model: this.model});
             app.modal.show(detailView);
         },*/
         onRender: function() {
-            var statusCell = this.$el.find("td").eq(1);
-            var socialName = this.model.get("name");
-            var socialStatus = this.model.get("status");
-            var socialSyncLink = (this.model.get("sync_link")) ? this.model.get("sync_link") : '#sync/' + socialName;
+            var statusCell = this.$el.find("td").eq(1),
+                socialName = this.model.get("name"),
+                socialStatus = this.model.get("status"),
+                socialSyncLink = (this.model.get("sync_link")) ? this.model.get("sync_link") : '#sync/' + socialName;
             (socialStatus) ?
                 statusCell.html('<span class="status-true"></span>' +
-                    //'<a class="view">View</a> | ' +
                     '<a class="view" href="#view/' + socialName + '">View</a> | ' +
-                    //'<a class="reset" href="#reset/' + socialName + '">Reset</a>') :
                     '<a class="reset">Reset</a>') :
                 statusCell.html('<span class="status-false"></span><a href="' + socialSyncLink + '">Sync</a>');
             console.log('SocialRowView: onRender');
         },
         change: function () {
-            console.log('SocialRowView: change');
+            //console.log('SocialRowView: change');
             //this.render();
         },
         destroy: function() {
-            console.log('SocialRowView: destroy');
+            //console.log('SocialRowView: destroy');
         },
         onClickReset: function () {
             var self = this;
-            self.model.save({'status': 0}, {
+            self.model.save({'status': null}, {
                 success: function (model, response) {
                     //NoticeView.setNotice(response.responseText, 'success');
                     //self.showNotice();
                     console.log('Success: ' + response.result);
                     if (response.result) {
                         self.render();
+                        app.SessionHelper.setItem("status:" + self.model.get("name"), self.model.get("status"));
                     }
-                    //alert('s');
                 },
                 error: function (model, response) {
                     //NoticeView.setNotice(response.responseText, 'error');
                     //self.showNotice();
                     console.log('Error: ' + response.result);
-                    //alert('e');
                 },
                 wait: true
             });
-            //self.model.save();
-
         },
         onClickView: function() {
             //var posts = new app.LibraryApp.Post();
@@ -98,21 +127,10 @@ app.SocialViewer = function(){
     var SocialListView = Backbone.Marionette.CompositeView.extend({
         tagName: "table",
         template: "#list-template",
-        //class: "bookList",
+        //class: "",
         childView: SocialRowView,
         //itemView: SocialViewRow,
         initialize: function(){
-            //_.bindAll(this, "showMessage", "loadMoreBooks");
-            /*var self = this;
-            app.vent.on("search:error", function(){
-                self.showMessage("Error, please retry later :s")
-            });
-            app.vent.on("search:noSearchTerm", function(){
-                self.showMessage("Hummmm, can do better :)")
-            });
-            app.vent.on("search:noResults", function(){
-                self.showMessage("No books found")
-            });*/
         }
        /* appendHtml: function(collectionView, itemView){
             console.log(itemView.el);
@@ -154,22 +172,47 @@ app.SocialViewer = function(){
             }
         }
     });
+
     SocialViewer.showTableSocial = function(socials){
         var socialListView = new SocialListView({ collection: socials });
         app.LibraryApp.layout.mainContainer.show(socialListView);
     };
-    SocialViewer.showSocialDetails = function(posts){
-        console.log(posts);
+    SocialViewer.showSocialDetails = function(posts, socialName){
+        //console.log(posts);
         var socialDetailView = new SocialDetailListView({ collection: posts });
         //console.log(socialDetailView);
         //app.modal.show(socialDetailView);
         //socialDetailView.render();
-        app.LibraryApp.layout.modalContainer.show(socialDetailView);
+        app.LibraryApp.layout.mainContainer.show(socialDetailView);
+        socialDetailView.hidePostPanel(socialName);
     };
-    app.vent.on("layout:rendered", function(){
+    //app.vent.on("layout:rendered", function(){
         // render a view for the existing HTML in the template, and attach it to the layout (i.e. don't double render)
         //var searchView = new SearchView();
         //app.LibraryApp.layout.search.attachView(searchView);
-    });
+    //});
     return SocialViewer;
 }();
+
+Date.prototype.toMysqlFormat = function() {
+    function twoDigits(d) {
+        if (0 <= d && d < 10) return "0" + d.toString();
+        if (-10 < d && d < 0) return "-0" + (-1 * d).toString();
+        return d.toString();
+    }
+    return this.getUTCFullYear() + "-" + twoDigits(1 + this.getUTCMonth()) + "-" + twoDigits(this.getUTCDate()) + " " + twoDigits(this.getUTCHours()) + ":" + twoDigits(this.getUTCMinutes()) + ":" + twoDigits(this.getUTCSeconds());
+};
+
+Date.prototype.getCurrentFormatedDate = function() {
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth() + 1;
+    var yyyy = today.getFullYear();
+    if (dd < 10) {
+        dd = '0' + dd
+    }
+    if (mm < 10) {
+        mm = '0' + mm
+    }
+    return dd + '/' + mm + '/' + yyyy;
+};
