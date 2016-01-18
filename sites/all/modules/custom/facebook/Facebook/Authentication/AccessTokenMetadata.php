@@ -352,13 +352,12 @@ class AccessTokenMetadata
      */
     public function validateExpiration()
     {
-        if (!$this->getExpiresAt() instanceof \DateTime) {
-            return;
+        if ($this->getExpiresAt()->getTimestamp() < time()) {
+            return false;
+            //throw new FacebookSDKException('The access token has expired. Please reply login with facebook.', 401);
         }
 
-        if ($this->getExpiresAt()->getTimestamp() < time()) {
-            throw new FacebookSDKException('Inspection of access token metadata shows that the access token has expired.', 401);
-        }
+        return true;
     }
 
     /**
