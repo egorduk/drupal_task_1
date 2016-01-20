@@ -172,6 +172,47 @@ app.SocialViewer = function(){
             }
         }
     });
+    var userModel = new app.LibraryApp.UserModel();
+    var AuthView = Backbone.Marionette.ItemView.extend({
+        template: "#auth-template",
+        events: {
+            'click #login-submit': 'loginSubmit'
+        },
+        loginSubmit: function() {
+            var username = this.$el.find('#login-username').val(),
+                password = this.$el.find('#login-password').val();
+           /* var userModel = new app.LibraryApp.UserModel({
+             login: login,
+             email: password
+             });*/
+            userModel.set({ username: username, password: password });
+            var self = this;
+            self.fetchUser();
+        },
+        initialize: function() {
+            console.log('AuthView: initialize');
+        },
+        onRender: function() {
+            console.log('AuthView: onRender');
+        },
+        fetchUser: function() {
+            var self = this;
+            userModel.fetch({}).fail(function(a){
+                console.log('E ' + a);
+            }).done(function(response) {
+                console.log(response);
+                if (response.hasOwnProperty('session_name') && response.hasOwnProperty('sessid')) {
+                    $.cookie(response.session_name, response.sessid);
+                    self.hidePanel();
+                } else {
+
+                }
+            });
+        },
+        hidePanel: function() {
+            this.$el.empty();
+        }
+    });
 
     SocialViewer.showTableSocial = function(socials){
         var socialListView = new SocialListView({ collection: socials });
@@ -185,6 +226,14 @@ app.SocialViewer = function(){
         //socialDetailView.render();
         app.LibraryApp.layout.mainContainer.show(socialDetailView);
         socialDetailView.hidePostPanel(socialName);
+    };
+    SocialViewer.showAuth = function(){
+        //console.log(posts);
+        var a = new AuthView();
+        //console.log(socialDetailView);
+        //app.modal.show(socialDetailView);
+        //socialDetailView.render();
+        app.LibraryApp.layout.mainContainer.show(a);
     };
     //app.vent.on("layout:rendered", function(){
         // render a view for the existing HTML in the template, and attach it to the layout (i.e. don't double render)

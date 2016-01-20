@@ -1,5 +1,6 @@
 <?php
 function twitter_uninstall() {
+    drupal_uninstall_schema('twitter');
 }
 
 function twitter_schema() {
@@ -22,4 +23,5 @@ function twitter_schema() {
 }
 
 function twitter_install() {
+    drupal_install_schema('twitter');
 }

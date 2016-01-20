@@ -73,13 +73,13 @@ app.NoticeView = Backbone.Marionette.ItemView.extend({
     }
 });
 app.vent.on("layout: rendered", function(){
-    console.log("layout:rendered");
+    //console.log("Layout: rendered");
     var menu = new app.MenuView();
     app.menuRegion.attachView(menu);
 });
 app.vent.on("routing: started", function(){
     app.SessionHelper = window.sessionStorage;
-    console.log("routing:started");
+    //console.log("Routing: started");
     if (!Backbone.History.started) {
         Backbone.history.start();
     }

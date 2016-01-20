@@ -6,6 +6,7 @@ app.ConfigApp = function(){
     ConfigApp.urlGetPosts = this.projectFolder + "notes/post/get_posts/";
     ConfigApp.urlPost = this.projectFolder + "notes/post";
     ConfigApp.urlSocial = this.projectFolder + "notes/social";
+    ConfigApp.urlUser = this.projectFolder + "notes/auth";
     ConfigApp.socialArray = ['twitter', 'facebook', 'instagram'];
     return ConfigApp;
 }();

@@ -31,10 +31,27 @@ app.LibraryApp = function(){
         sync: function(method, collection, options){
             options = options || {};
             options.beforeSend = function(xhr) {
-                //token = 'R4hr3lccvEZNIfRHP2I21YqqG_lBBa8w627yLMGresE';
                 xhr.setRequestHeader('X-CSRF-Token', token);
             };
             return Backbone.sync.call(this, method, collection, options);
+        }
+    });
+    Backbone._AuthenticatedModel = Backbone.Model.extend({
+        sync: function(method, collection, options){
+            options = options || {};
+            console.log(this);
+            if (method == 'read') {
+                options.url = this.urlRoot + '/user_login?username=' + this.get("username") + '&password=' + this.get("password");
+            }
+            return Backbone.sync.call(this, method, collection, options);
+        }
+    });
+    LibraryApp.UserModel = Backbone._AuthenticatedModel.extend({
+        urlRoot: app.ConfigApp.urlUser,
+        defaults: {
+            username: '',
+            password: '',
+            email: ''
         }
     });
     var PostModel = Backbone.AuthenticatedModel.extend({
@@ -89,7 +106,27 @@ app.LibraryApp = function(){
             });
         }
     });
+    var UserCollection = Backbone.Collection.extend({
+        model: LibraryApp.UserModel,
+        url: app.ConfigApp.urlGetSocials,
+        /*initialize: function() {
+            console.log('SocialCollection: initialize');
+            var self = this;
+            app.vent.on("social:getSocials", function(){
+                self.fetchSocials();
+            });
+        },
+        fetchSocials: function() {
+            this.fetch({}).fail(function(){}).done(function(data) {
+                console.log(data);
+                _(data).each(function(item) {
+                    app.SessionHelper.setItem("status:" + item.name, item.status);
+                });
+            });
+        }*/
+    });
     LibraryApp.SocialCollection = new SocialCollection();
+    //LibraryApp.UserCollection = new UserCollection();
     LibraryApp.initializeLayout = function(){
         LibraryApp.layout = new Layout();
         LibraryApp.layout.on("show", function(){
@@ -109,8 +146,9 @@ app.LibraryApp = function(){
             app.vent.trigger("social:authSuccess:facebook");
         }*/
         LibraryApp.initializeLayout();
-        app.SocialViewer.showTableSocial(LibraryApp.SocialCollection);
-        app.vent.trigger("social:getSocials");
+        app.SocialViewer.showAuth();
+        //app.SocialViewer.showTableSocial(LibraryApp.SocialCollection);
+        //app.vent.trigger("social:getSocials");
     };
     LibraryApp.viewSocial = function(socialName){
         //console.log("view " + socialName);

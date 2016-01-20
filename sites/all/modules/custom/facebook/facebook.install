@@ -1,5 +1,6 @@
 <?php
 function facebook_uninstall() {
+    drupal_uninstall_schema('facebook');
 }
 
 function facebook_schema() {
@@ -21,4 +22,5 @@ function facebook_schema() {
 }
 
 function facebook_install() {
+    drupal_install_schema('facebook');
 }

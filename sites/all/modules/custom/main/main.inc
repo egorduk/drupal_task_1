@@ -176,3 +176,42 @@ function _main_public_post($data) {
     }
     return true;
 }
+
+function _main_auth_user($mode, $data) {
+    if (isset($data) &&  is_array($data)) {
+        $data = (object)$data;
+    }
+    if (!isset($data->username) || !isset($data->password)) {
+        return services_error('Missing attribute', 406);
+    }
+    $base_url = 'http://localhost/drupal_task_1/notes';
+    $data = array(
+        'username' => $data->username,
+        'password' => $data->password,
+    );
+    //$data = drupal_json_encode($data);
+    $data = http_build_query($data, '', '&');
+    $options = array(
+        $headers = array('Content-Type' => 'application/x-www-form-urlencoded'),
+        //$headers = array('Content-Type' => 'application/json'),
+        'method' => 'POST',
+        'data' => $data
+    );
+    $response = drupal_http_request($base_url . '/user/login', $options);
+    //$data = json_decode($response->data);
+
+    return (json_decode($response->data));
+// Check if login was successful
+    if ($response->code == 200) {
+        // Now recycle the login cookie we received in the first request
+        $options['headers']['Cookie'] = $data->session_name . '=' . $data->sessid;
+        // Get info about a user
+        $data = array();
+        $options['data'] = http_build_query($data, '', '&');
+        $options['method'] = 'GET';
+        $response = drupal_http_request($base_url . '/user/32', $options);
+        return ($response);
+    } else {
+        return services_error('Missing attribute', 404);
+    }
+}

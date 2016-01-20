@@ -1,9 +1,9 @@
 <?php
 
-define("APP_ID", "1035129189845262");
-define("APP_SECRET", "1e121667b64b99f97148211d7df38a60");
+//define("APP_ID", "1035129189845262");
+//define("APP_SECRET", "1e121667b64b99f97148211d7df38a60");
 //define("APP_ACCESS_TOKEN", "CAAOtccuoSQ4BAAu8FYRzpgcIqt5rGEjKloWBQKZCis0wCScSZCMGgpC7ZA9bwySYB1DDFEfeaR3oZB3kmfmY1AfBJ0uGf3FB1sStngyPQ9aCU0NO6B9fZA2XEnOwZAHZAuJUY7R7FnHLbj07z4OU9LtFetLb1pM6ykL5C03swECyonvV6iXoqsnZCt3PGi3nRNvC7eINYw6jTYrCdwadVzX9");
-define("APP_REDIRECT_URL", "http://localhost/drupal_task_1/admin/config/facebook");
+//define("APP_REDIRECT_URL", "http://localhost/drupal_task_1/admin/config/facebook");
 
 function facebook_page_view() {
     $url = 'https://www.facebook.com/dialog/oauth';

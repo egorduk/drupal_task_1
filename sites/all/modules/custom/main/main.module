@@ -6,22 +6,23 @@ function main_menu() {
         'title' => 'Registration form',
         'page callback' => 'drupal_get_form',
         'access callback' => TRUE,
-        'page arguments' => array('main_user_register_form'),
+        'page arguments' => array('main_user_register_form')
     );
-    $items['user/social/add'] = array(
-        'title' => 'Add social accounts',
-        'page callback' => 'social_add',
-        //'access arguments' => array('administer site configuration'),
+  /*  $items['user/login'] = array(
+        'title' => 'Login form',
+        'page callback' => 'drupal_get_form',
         'access callback' => TRUE,
-        'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
-        'file' => 'social.pages.inc',
-    );
-    $items['user/test'] = array(
-        'title' => 'Home page',
+        'page arguments' => array('main_user_login_form')
+    );*/
+    $items['social'] = array(
+        'title' => 'Social aggregator',
         'page callback' => 'main_page_callback',
-        'access callback' => TRUE,
+        //'access callback' => TRUE,
+        'access arguments' => array('access content'),
+        //'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
         'file' => 'main.pages.inc'
     );
+
     return $items;
 }
 
@@ -30,15 +31,14 @@ function main_page_callback() {
     $content = array(
         '#markup' => '',
         '#attached' => array(
-            // include backbone (underscore is automatically added as a dependency)
             //'libraries_load' => array(array('backbone')),
-            // include our custom js and settings
             'js' => array(
                 array('data' => $module_path . '/js/jquery.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/underscore.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/backbone.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/backbone.marionette.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/app.js', 'type' => 'file', 'scope' => 'footer'),
+                array('data' => $module_path . '/js/jquery.cookie.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/app_config.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/app_second.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/app_viewer.js', 'type' => 'file', 'scope' => 'footer'),
@@ -58,96 +58,63 @@ function main_page_callback() {
     );
     //$content['#attached']['css'][] = $module_path . '/css/style.css';
     $content['#attached']['css']['.socialDetail {border:1px solid black;width:600px;height:auto} .post-detail {border: 1px solid black;}'] = array( 'type' => 'inline');
-    //$layout = "http://localhost/drupal_task_1/" . $module_path . "/layout.tpl";
-    //$item = "http://localhost/drupal_task_1/" . $module_path . "/item.tpl";
     $content['#markup'] = '
-<!--<script type="text/template" id="layout-template">
-   <h1>Main Template</h1>
-    <div id="regionOne"></div>
-   <!-- <thead>
-        <tr>
-            <th>Social name</th>
-            <th>Status</th>
-        </tr>
-    </thead>
-    <tbody></tbody>-->
-   <!-- <div id="Navigation">
-        <a id="nav-home" class="navButton" href="#home">Home</a> : : :
-        <a id="nav-info" class="navButton" href="#info">Information</a>
-    </div>
-</script>-->
-
-<script type="text/template" id="notice-item"></script>
-<div id="menu">
-    <a href="#main" class="js-menu-main">Main</a>
-    <a href="#feeds" class="js-menu-feeds">Feeds</a>
-    <a href="http://localhost/drupal_task_1/user/test" class="js-menu-exit">Exit</a>
-</div>
-<div id="content1"></div>
-<div id="modal"></div>
-<!--<script type="text/template" id="layout-template">
-    <div id="searchBar">
-        Search : <input type="text" name="search" autocomplete="off" id="searchTerm" value="" />
-        <img src="" alt="Loading..." id="spinner" />
-    </div>
-    <div id="bookContainer"></div>
-</script>-->
-<!--<script type="text/template" id="book-list-template">
-   <div style="display:table;width:100%;height:100%;">
-      <div class="leftBar"><%=name%></div>
-      <div class="books"><%=status%></div>
-    </div>
-</script>-->
-<script type="text/template" id="layout-template">
-    <div id="noticeContainer"></div>
-    <div id="mainContainer"></div>
-    <div id="modalContainer"></div>
-</script>
-<script type="text/template" id="list-template">
-    <thead>
-        <tr>
-            <th>Social name</th>
-            <th>Status</th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-</script>
-<script type="text/template" id="item-template">
-    <td><%=name%></td>
-    <td></td>
-</script>
-<script type="text/template" id="close-template">
-    <p>That\'s all, folks !</p>
-</script>
-<script type="text/template" id="social-item-template">
-    <div class="post-detail">
-        <div class="content"><%=content%></div>
-        <div class="date_post"><%=date_post%></div>
-    </div>
-</script>
-<script type="text/template" id="social-list-template">
-    <a class="close" data-dismiss="modal" href="#">x</a>
-    <div class="user_name"></div>
-    <div class="panel-new-post">
-        <textarea placeholder="Комментировать" class="text-new-post"></textarea>
-        <button class="add-new-post">Отправить</button>
-    </div>
-</script>
-
-
-<!--<script type="text/template" id="item-template">
-    <td><%=name%></td>
-    <td><%=status%></td>
-</script>
-<script type="text/template" id="template-HomeLayoutView">
-    <h2>Home</h2>
-    <p>This is the home view</p>
-</script>
-<script type="text/template" id="template-InfoLayoutView">
-    <h2>Information</h2>
-    <p>This is a page of information</p>
-</script>-->
-';
+     <script type="text/template" id="notice-item"></script>
+     <div id="menu">
+         <a href="#main" class="js-menu-main">Main</a>
+         <a href="#feeds" class="js-menu-feeds">Feeds</a>
+         <a href="http://localhost/drupal_task_1/user/test" class="js-menu-exit">Exit</a>
+     </div>
+     <div id="content1"></div>
+     <div id="modal"></div>
+     <!--<script type="text/template" id="layout-template">
+             <img src="" alt="Loading..." id="spinner" />-->
+     <script type="text/template" id="layout-template">
+         <div id="noticeContainer"></div>
+         <div id="mainContainer"></div>
+         <div id="modalContainer"></div>
+     </script>
+     <script type="text/template" id="auth-template">
+         <div id="login-form">
+            <label for="edit-name">Login <span title="This field is required." class="form-required">*</span></label>
+            <input type="text" class="form-text required" maxlength="60" size="60" value="" name="name" id="login-username">
+            <label for="edit-pass">Password <span title="This field is required." class="form-required">*</span></label>
+            <input type="password" class="form-text required" maxlength="60" size="60" name="pass" id="login-password">
+            <input type="submit" class="form-submit" value="Log in" id="login-submit">
+         </div>
+         <div id="reg-form"></div>
+     </script>
+     <script type="text/template" id="list-template">
+         <thead>
+             <tr>
+                 <th>Social name</th>
+                 <th>Status</th>
+             </tr>
+         </thead>
+         <tbody></tbody>
+     </script>
+     <script type="text/template" id="item-template">
+         <td><%=name%></td>
+         <td></td>
+     </script>
+     <script type="text/template" id="close-template">
+         <p>That\'s all, folks !</p>
+     </script>
+     <script type="text/template" id="social-item-template">
+         <div class="post-detail">
+             <div class="content"><%=content%></div>
+             <div class="date_post"><%=date_post%></div>
+         </div>
+     </script>
+     <script type="text/template" id="social-list-template">
+         <a class="close" data-dismiss="modal" href="#">x</a>
+         <div class="user_name"></div>
+         <div class="panel-new-post">
+             <textarea placeholder="Комментировать" class="text-new-post"></textarea>
+             <button class="add-new-post">Отправить</button>
+         </div>
+     </script>
+     ';
     return $content;
 }
 
@@ -221,7 +188,7 @@ function main_user_register_form_validate($form, &$form_state) {
         form_set_error('email', t('Incorrect email format.'));
     }
     if ($form_state['values']['password'] != $form_state['values']['password_approve']) {
-        form_set_error('password_approve', t('Passwords don\'t equal'));
+        form_set_error('password_approve', t('Passwords are not equal'));
         //form_set_error('password', t('Passwords don\'t. equal'));
     }
 }
@@ -238,6 +205,30 @@ function main_user_register_form_submit($form, &$form_state){
     );
     user_save(null, $newUser);
     drupal_set_message("Successful registration.");
+}
+
+function main_user_login_form($form, &$form_state) {
+    $form['login'] = array(
+        '#title' => 'Login',
+        '#description' => '',
+        '#type' => 'textfield',
+        '#size' => 30,
+        '#maxlength' => 10,
+        '#required' => TRUE,
+    );
+    $form['password'] = array(
+        '#title' => 'Password',
+        '#description' => '',
+        '#type' => 'password',
+        '#size' => 30,
+        '#maxlength' => 10,
+        '#required' => TRUE,
+    );
+    $form['submit'] = array(
+        '#type' => 'submit',
+        '#value' => t('Sign in'),
+    );
+    return $form;
 }
 
 function main_perm() {
@@ -379,22 +370,6 @@ function main_services_resources() {
             ),
         ),
         'social' => array(
-            /*'relationships' => array(
-                'get_socials' => array(
-                    'help' => 'Retrieves a listing of notes',
-                    'file' => array('file' => 'inc', 'module' => 'main'),
-                    'callback' => '_main_get_socials',
-                    'access arguments' => array('administer site configuration'),
-                )
-            ),
-            'actions' => array(
-                'get_socials1' => array(
-                    'help' => 'Retrieves a listing of notes',
-                    'file' => array('file' => 'inc', 'module' => 'main'),
-                    'callback' => '_main_get_socials',
-                    'access arguments' => array('administer site configuration'),
-                )
-            ),*/
             'index' => array(
                 'help' => 'Retrieves a listing of socials',
                 'file' => array('file' => 'inc', 'module' => 'main'),
@@ -427,8 +402,8 @@ function main_services_resources() {
                         'source' => array('path' => '0'),
                         'optional' => FALSE,
                     )
-                ),
-            ),
+                )
+            )
         ),
         'post' => array(
             'index' => array(
@@ -468,22 +443,32 @@ function main_services_resources() {
                         'optional' => FALSE,
                     ),
                 ),
-            ),
-            /*'retrieve' => array(
-                'help' => 'Retrieves a note',
+            )
+        ),
+        'auth' => array(
+            'index' => array(
+                'help' => 'Authorization user',
                 'file' => array('file' => 'inc', 'module' => 'main'),
-                'callback' => '_main_get_posts',
-                'access arguments' => array('administer site configuration'),
+                'callback' => '_main_auth_user',
+                'access arguments' => array('access content'),
                 'args' => array(
                     array(
-                        'name' => 'id',
-                        'type' => 'int',
-                        'description' => 'The id of the selected social',
+                        'name' => 'mode',
+                        'type' => 'string',
+                        'description' => 'Mode',
                         'source' => array('path' => '0'),
                         'optional' => FALSE,
                     ),
-                ),
-            ),*/
+                    array(
+                         'name' => 'parameters',
+                         'type' => 'array',
+                         'description' => 'User parameters',
+                         'source' => 'param',
+                         'optional' => TRUE,
+                         'default value' => array(),
+                     )
+                )
+            )
         )
     );
 }

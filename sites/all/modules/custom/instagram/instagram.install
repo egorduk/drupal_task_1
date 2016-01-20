@@ -1,5 +1,6 @@
 <?php
 function instagram_uninstall() {
+    drupal_uninstall_schema('instagram');
 }
 
 function instagram_schema() {
@@ -21,4 +22,5 @@ function instagram_schema() {
 }
 
 function instagram_install() {
+    drupal_install_schema('instagram');
 }
