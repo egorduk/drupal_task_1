@@ -156,7 +156,6 @@ function _main_get_type_social_by_id($id) {
 }
 
 function _main_public_post($data) {
-    //var_dump($data);
     if (isset($data) &&  is_array($data)) {
         $data = (object)$data;
     }
@@ -199,19 +198,38 @@ function _main_auth_user($mode, $data) {
     );
     $response = drupal_http_request($base_url . '/user/login', $options);
     //$data = json_decode($response->data);
-
     return (json_decode($response->data));
 // Check if login was successful
     if ($response->code == 200) {
-        // Now recycle the login cookie we received in the first request
-        $options['headers']['Cookie'] = $data->session_name . '=' . $data->sessid;
-        // Get info about a user
-        $data = array();
-        $options['data'] = http_build_query($data, '', '&');
-        $options['method'] = 'GET';
-        $response = drupal_http_request($base_url . '/user/32', $options);
-        return ($response);
     } else {
         return services_error('Missing attribute', 404);
     }
+}
+
+function _main_auth_create_user($data) {
+    if (isset($data) &&  is_array($data)) {
+        $data = (object)$data;
+    }
+    if (!isset($data->username) || !isset($data->email) || !isset($data->password) || !isset($data->approve_password)) {
+        return services_error('Missing attribute', 406);
+    }
+    if (!valid_email_address($data->email)) {
+        return services_error('Incorrect email', 406);
+    }
+    if ($data->password != $data->approve_password) {
+        return services_error('Passwords are not equal', 406);
+    }
+    $newUser = array(
+        'name' => $data->username,
+        'pass' => $data->password,
+        'mail' => $data->email,
+        'init' => $data->email,
+        'status' => 1,
+        'access' => REQUEST_TIME,
+        'created' => REQUEST_TIME
+    );
+    user_save(null, $newUser);
+    //drupal_set_message("Successful registration.");
+    //return services_error('Success', 200);
+    return true;
 }

@@ -13,7 +13,7 @@ app.AppRouting = function(){
         AppRouting.router = new AppRouting.Router({
             controller: app.LibraryApp
         });
-        app.vent.trigger("Routing: started");
+        app.vent.trigger("routing: started");
     });
     return AppRouting;
 }();

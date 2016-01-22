@@ -22,7 +22,6 @@ function main_menu() {
         //'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
         'file' => 'main.pages.inc'
     );
-
     return $items;
 }
 
@@ -57,14 +56,18 @@ function main_page_callback() {
         ),
     );
     //$content['#attached']['css'][] = $module_path . '/css/style.css';
-    $content['#attached']['css']['.socialDetail {border:1px solid black;width:600px;height:auto} .post-detail {border: 1px solid black;}'] = array( 'type' => 'inline');
+    $content['#attached']['css']['.socialDetail {border:1px solid black;width:600px;height:auto} .post-detail {border: 1px solid black;} #block-user-login {display: none;}'] = array( 'type' => 'inline');
+    $loginForm = drupal_get_form('user_login');
+    $loginForm = drupal_render($loginForm);
+    $regForm = drupal_get_form('main_user_register_form');
+    $regForm = drupal_render($regForm);
     $content['#markup'] = '
      <script type="text/template" id="notice-item"></script>
-     <div id="menu">
+     <!--<div id="menu">
          <a href="#main" class="js-menu-main">Main</a>
          <a href="#feeds" class="js-menu-feeds">Feeds</a>
          <a href="http://localhost/drupal_task_1/user/test" class="js-menu-exit">Exit</a>
-     </div>
+     </div>-->
      <div id="content1"></div>
      <div id="modal"></div>
      <!--<script type="text/template" id="layout-template">
@@ -75,14 +78,13 @@ function main_page_callback() {
          <div id="modalContainer"></div>
      </script>
      <script type="text/template" id="auth-template">
-         <div id="login-form">
-            <label for="edit-name">Login <span title="This field is required." class="form-required">*</span></label>
+         <div id="login-form">' . $loginForm . '</div>
+            <!--<label for="edit-name">Login <span title="This field is required." class="form-required">*</span></label>
             <input type="text" class="form-text required" maxlength="60" size="60" value="" name="name" id="login-username">
             <label for="edit-pass">Password <span title="This field is required." class="form-required">*</span></label>
             <input type="password" class="form-text required" maxlength="60" size="60" name="pass" id="login-password">
-            <input type="submit" class="form-submit" value="Log in" id="login-submit">
-         </div>
-         <div id="reg-form"></div>
+            <input type="submit" class="form-submit" value="Log in" id="login-submit">-->
+         <div id="reg-form">' . $regForm . '</div>
      </script>
      <script type="text/template" id="list-template">
          <thead>
@@ -145,12 +147,13 @@ function main_settings_libraries_info() {
 
 function main_user_register_form($form, &$form_state) {
     $form['login'] = array(
-        '#title' => 'Login',
+        '#title' => 'Username',
         '#description' => '',
         '#type' => 'textfield',
         '#size' => 30,
         '#maxlength' => 10,
         '#required' => TRUE,
+        '#id' => 'reg-name'
     );
     $form['email'] = array(
         '#title' => 'Email',
@@ -159,6 +162,7 @@ function main_user_register_form($form, &$form_state) {
         '#size' => 30,
         '#maxlength' => 15,
         '#required' => TRUE,
+        '#id' => 'reg-email'
     );
     $form['password'] = array(
         '#title' => 'Password',
@@ -167,6 +171,7 @@ function main_user_register_form($form, &$form_state) {
         '#size' => 30,
         '#maxlength' => 10,
         '#required' => TRUE,
+        '#id' => 'reg-pass'
     );
     $form['password_approve'] = array(
         '#title' => 'Approve password',
@@ -175,9 +180,11 @@ function main_user_register_form($form, &$form_state) {
         '#size' => 30,
         '#maxlength' => 10,
         '#required' => TRUE,
+        '#id' => 'reg-approve-pass'
     );
     $form['submit'] = array(
         '#type' => 'submit',
+        '#id' => 'reg-submit',
         '#value' => t('Sign up'),
     );
     return $form;
@@ -468,6 +475,21 @@ function main_services_resources() {
                          'default value' => array(),
                      )
                 )
+            ),
+            'create' => array(
+                'help' => 'Creates new user',
+                'file' => array('file' => 'inc', 'module' => 'main'),
+                'callback' => '_main_auth_create_user',
+                'access arguments' => array('access content'),
+                'args' => array(
+                    array(
+                        'name' => 'data',
+                        'type' => 'struct',
+                        'description' => 'User data',
+                        'source' => 'data',
+                        'optional' => FALSE,
+                    ),
+                ),
             )
         )
     );

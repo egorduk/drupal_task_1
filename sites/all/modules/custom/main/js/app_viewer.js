@@ -14,15 +14,14 @@ app.SocialViewer = function(){
         className: "modal socialDetail",
         childView: SocialDetailItemView,
         events: {
-            'click .add-new-post': 'onClickAdd'
+            'click .add-new-post': 'addNewPost'
         },
-        onClickAdd: function() {
+        addNewPost: function() {
             var textareaEl = this.$el.find('textarea'),
                 postText = textareaEl.val(),
                 self = this;
             if (postText.length <= 3) {
-                NoticeView.setNotice('Too little message (need more then 3 letters)', 'warning');
-                self.showNotice();
+                NoticeView.viewNotice('Too little message (need more then 3 letters)', 'warning');
                 return;
             }
             var post = new app.LibraryApp.PostModel({
@@ -32,16 +31,15 @@ app.SocialViewer = function(){
                 social_name: app.LibraryApp.PostCollection.socialName
             });
             textareaEl.val("");
-            //cm.navToDiv('cm-item-' + model.id);
             post.save({}, {
                 success: function (model, response) {
-                    console.log("Success", response);
+                    //console.log("Success", response);
+                    NoticeView.viewNotice('Done!', 'success');
                     app.LibraryApp.PostCollection.add(model, {at: 0});
-                    //console.log(app.LibraryApp.PostCollection);
-                    //cm.navToDiv('cm-item-' + model.id);
                 },
                 error: function (model, response) {
-                    console.log("Error", response);
+                    NoticeView.viewNotice('Something wrong', 'error');
+                    //console.log("Error", response);
                 }
             });
         },
@@ -54,9 +52,6 @@ app.SocialViewer = function(){
         hidePostPanel: function(socialName) {
             var panelNewPost = this.$el.find('.panel-new-post');
             (socialName === 'instagram') ? panelNewPost.hide() : panelNewPost.show();
-        },
-        showNotice: function() {
-            app.LibraryApp.layout.noticeContainer.show(NoticeView.render());
         }
     });
     var NoticeView = new app.NoticeView();
@@ -99,8 +94,7 @@ app.SocialViewer = function(){
             var self = this;
             self.model.save({'status': null}, {
                 success: function (model, response) {
-                    //NoticeView.setNotice(response.responseText, 'success');
-                    //self.showNotice();
+                    //NoticeView.viewNotice(response.responseText, 'success');
                     console.log('Success: ' + response.result);
                     if (response.result) {
                         self.render();
@@ -108,8 +102,7 @@ app.SocialViewer = function(){
                     }
                 },
                 error: function (model, response) {
-                    //NoticeView.setNotice(response.responseText, 'error');
-                    //self.showNotice();
+                    //NoticeView.viewNotice(response.responseText, 'error');
                     console.log('Error: ' + response.result);
                 },
                 wait: true
@@ -119,9 +112,6 @@ app.SocialViewer = function(){
             //var posts = new app.LibraryApp.Post();
             //var socialView = new SocialView({ collection: posts});
             //app.modal.show(socialView);
-        },
-        showNotice: function() {
-            app.LibraryApp.layout.noticeContainer.show(NoticeView.render());
         }
     });
     var SocialListView = Backbone.Marionette.CompositeView.extend({
@@ -129,25 +119,6 @@ app.SocialViewer = function(){
         template: "#list-template",
         //class: "",
         childView: SocialRowView,
-        //itemView: SocialViewRow,
-        initialize: function(){
-        }
-       /* appendHtml: function(collectionView, itemView){
-            console.log(itemView.el);
-            collectionView.$(".books").append(itemView.el);
-        },
-        showMessage: function(message){
-            this.$('.books').html('<h1 class="notFound">' + message + '</h1>');
-        },
-        loadMoreBooks: function(){
-            var totalHeight = this.$('> div').height(),
-                scrollTop = this.$el.scrollTop() + this.$el.height(),
-                margin = 200;
-            // if we are closer than 'margin' to the end of the content, load more books
-            if (scrollTop + margin >= totalHeight) {
-                app.vent.trigger("search:more");
-            }
-        }*/
     });
     var SearchView = Backbone.View.extend({
         el: "#searchBar",
@@ -172,45 +143,84 @@ app.SocialViewer = function(){
             }
         }
     });
-    var userModel = new app.LibraryApp.UserModel();
     var AuthView = Backbone.Marionette.ItemView.extend({
         template: "#auth-template",
         events: {
-            'click #login-submit': 'loginSubmit'
+            'click #edit-submit': 'loginSubmit',
+            'click #reg-submit': 'regSubmit',
+            'click #link-logout': 'logout'
         },
-        loginSubmit: function() {
-            var username = this.$el.find('#login-username').val(),
-                password = this.$el.find('#login-password').val();
-           /* var userModel = new app.LibraryApp.UserModel({
-             login: login,
-             email: password
-             });*/
-            userModel.set({ username: username, password: password });
-            var self = this;
-            self.fetchUser();
-        },
+        userModel: '',
+        sessionId: '',
         initialize: function() {
             console.log('AuthView: initialize');
+            this.userModel = new app.LibraryApp.UserModel();
         },
         onRender: function() {
             console.log('AuthView: onRender');
         },
+        loginSubmit: function(e) {
+            e.preventDefault();
+            var username = this.$el.find('#edit-name').val(),
+                password = this.$el.find('#edit-pass').val();
+            this.userModel.set({ username: username, password: password });
+            var self = this;
+            self.fetchUser();
+        },
+        regSubmit: function(e) {
+            e.preventDefault();
+            var username = this.$el.find('#reg-name').val(),
+                email = this.$el.find('#reg-email').val(),
+                password = this.$el.find('#reg-pass').val(),
+                approvePassword = this.$el.find('#reg-approve-pass').val();
+            this.userModel = new app.LibraryApp.UserModel({
+                username: username,
+                password: password,
+                email: email,
+                approve_password: approvePassword
+            });
+            this.regUser();
+        },
         fetchUser: function() {
             var self = this;
-            userModel.fetch({}).fail(function(a){
-                console.log('E ' + a);
+            this.userModel.fetch({}).fail(function(response){
+                console.log(response);
+                NoticeView.viewNotice('Something wrong', 'error');
             }).done(function(response) {
                 console.log(response);
                 if (response.hasOwnProperty('session_name') && response.hasOwnProperty('sessid')) {
-                    $.cookie(response.session_name, response.sessid);
-                    self.hidePanel();
+                    self.sessionId = response.session_name;
+                    $.cookie(self.sessionId, response.sessid);
+                    self.hideAuthPanels();
+                    self.showLogoutLink();
                 } else {
-
+                    NoticeView.viewNotice('Something wrong', 'error');
                 }
             });
         },
-        hidePanel: function() {
+        regUser: function() {
+            this.userModel.save({}, {
+                success: function (model, response) {
+                    NoticeView.viewNotice('Created! Please log in using your new account', 'success');
+                },
+                error: function (model, response) {
+                    console.log("Error", response);
+                }
+            });
+        },
+        hideAuthPanels: function() {
             this.$el.empty();
+        },
+        showAuthPanels: function() {
+            this.render();
+        },
+        showLogoutLink: function() {
+            this.$el.html('<a id="link-logout" href="' + app.ConfigApp.projectFolder + 'user/logout">Logout</a>');
+        },
+        logout: function(e) {
+            e.preventDefault();
+            $.removeCookie(this.sessionId);
+            this.showAuthPanels();
         }
     });
 

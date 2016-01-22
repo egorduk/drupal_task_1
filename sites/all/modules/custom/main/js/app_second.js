@@ -1,14 +1,14 @@
 app.LibraryApp = function(){
-    var LibraryApp = {};
-    var Layout = Backbone.Marionette.LayoutView.extend({
+    var LibraryApp = {},
+        Layout = Backbone.Marionette.LayoutView.extend({
         template: "#layout-template",
         regions: {
             mainContainer: "#mainContainer",
             noticeContainer: "#noticeContainer",
             modalContainer: '#modalContainer'
         }
-    });
-    var token = '', flOnlyOneRequest = true;
+    }),
+        token = '', flOnlyOneRequest = true;
     Backbone.AuthenticatedModel = Backbone.Model.extend({
         initialize: function(){
             if (flOnlyOneRequest) {
@@ -51,7 +51,8 @@ app.LibraryApp = function(){
         defaults: {
             username: '',
             password: '',
-            email: ''
+            email: '',
+            approve_password: ''
         }
     });
     var PostModel = Backbone.AuthenticatedModel.extend({
@@ -106,45 +107,16 @@ app.LibraryApp = function(){
             });
         }
     });
-    var UserCollection = Backbone.Collection.extend({
-        model: LibraryApp.UserModel,
-        url: app.ConfigApp.urlGetSocials,
-        /*initialize: function() {
-            console.log('SocialCollection: initialize');
-            var self = this;
-            app.vent.on("social:getSocials", function(){
-                self.fetchSocials();
-            });
-        },
-        fetchSocials: function() {
-            this.fetch({}).fail(function(){}).done(function(data) {
-                console.log(data);
-                _(data).each(function(item) {
-                    app.SessionHelper.setItem("status:" + item.name, item.status);
-                });
-            });
-        }*/
-    });
     LibraryApp.SocialCollection = new SocialCollection();
-    //LibraryApp.UserCollection = new UserCollection();
     LibraryApp.initializeLayout = function(){
         LibraryApp.layout = new Layout();
         LibraryApp.layout.on("show", function(){
-            app.vent.trigger("Layout: rendered");
+            app.vent.trigger("layout: rendered");
         });
         app.contentRegion.show(app.LibraryApp.layout);
     };
     LibraryApp.PostModel = PostModel;
     LibraryApp.home = function() {
-        /*var parsedArrayUrl = LibraryApp.parseUrl();
-        if (parsedArrayUrl['social'] == 'twitter') {
-            app.vent.trigger("social:authSuccess:twitter");
-            console.log('Vent: social:authSuccess:twitter');
-        } else if (parsedArrayUrl['social'] == 'instagram') {
-            app.vent.trigger("social:authSuccess:instagram");
-        } else if (parsedArrayUrl['social'] == 'facebook') {
-            app.vent.trigger("social:authSuccess:facebook");
-        }*/
         LibraryApp.initializeLayout();
         app.SocialViewer.showAuth();
         //app.SocialViewer.showTableSocial(LibraryApp.SocialCollection);
@@ -163,12 +135,6 @@ app.LibraryApp = function(){
         app.SocialViewer.showSocialDetails(LibraryApp.PostCollection, socialName);
         app.vent.trigger("post:getPosts");
     };
-    /*LibraryApp.resetSocial = function(socialName){
-        console.log("reset " + socialName);
-    };
-    LibraryApp.syncSocial = function(socialName){
-        console.log("sync " + socialName);
-    };*/
     LibraryApp.parseUrl = function() {
         var params = [],
             queryString = window.location.href,
