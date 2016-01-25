@@ -1,52 +1,33 @@
 app.LibraryApp = function(){
     var LibraryApp = {},
         Layout = Backbone.Marionette.LayoutView.extend({
-        template: "#layout-template",
-        regions: {
-            mainContainer: "#mainContainer",
-            noticeContainer: "#noticeContainer",
-            modalContainer: '#modalContainer'
-        }
-    }),
-        token = '', flOnlyOneRequest = true;
-    Backbone.AuthenticatedModel = Backbone.Model.extend({
-        initialize: function(){
-            if (flOnlyOneRequest) {
-                flOnlyOneRequest = false;
-                $.ajax({
-                    url: app.ConfigApp.urlSessionToken,
-                    type: "GET",
-                    dataType: "text",
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        //alert(errorThrown);
-                        //NoticeView.setNotice(textStatus, 'error');
-                        //self.showNotice();
-                    },
-                    success: function (response) {
-                        token = response;
-                    }
-                });
+            template: "#layout-template",
+            regions: {
+                mainContainer: "#mainContainer",
+                noticeContainer: "#noticeContainer"
             }
-        },
+        }),
+        flOnlyOneRequest = true;
+    Backbone.AuthenticatedModel = Backbone.Model.extend({
         sync: function(method, collection, options){
             options = options || {};
             options.beforeSend = function(xhr) {
+                var token = $.cookie('social_session_token');
                 xhr.setRequestHeader('X-CSRF-Token', token);
             };
             return Backbone.sync.call(this, method, collection, options);
         }
     });
-    Backbone._AuthenticatedModel = Backbone.Model.extend({
+    Backbone.AuthenticatedUserModel = Backbone.Model.extend({
         sync: function(method, collection, options){
             options = options || {};
-            console.log(this);
             if (method == 'read') {
                 options.url = this.urlRoot + '/user_login?username=' + this.get("username") + '&password=' + this.get("password");
             }
             return Backbone.sync.call(this, method, collection, options);
         }
     });
-    LibraryApp.UserModel = Backbone._AuthenticatedModel.extend({
+    LibraryApp.UserModel = Backbone.AuthenticatedUserModel.extend({
         urlRoot: app.ConfigApp.urlUser,
         defaults: {
             username: '',
@@ -70,7 +51,7 @@ app.LibraryApp = function(){
             return app.ConfigApp.urlGetPosts + this.socialName + '.json';
         },
         initialize: function(models, options) {
-            console.log('PostCollection: initialize');
+            //console.log('PostCollection: initialize');
             var self = this;
             this.socialName = options.socialName;
             app.vent.on("post:getPosts", function(){
@@ -117,13 +98,22 @@ app.LibraryApp = function(){
     };
     LibraryApp.PostModel = PostModel;
     LibraryApp.home = function() {
-        LibraryApp.initializeLayout();
-        app.SocialViewer.showAuth();
-        //app.SocialViewer.showTableSocial(LibraryApp.SocialCollection);
-        //app.vent.trigger("social:getSocials");
+        if (app.ConfigApp.initLayout == 0) {
+            LibraryApp.initializeLayout();
+            app.ConfigApp.initLayout = 1;
+        }
+        if ($.cookie('social_session_id')) {
+            app.SocialViewer.showTableSocial(LibraryApp.SocialCollection);
+            app.vent.trigger("social:getSocials");
+        } else {
+            app.SocialViewer.showAuth();
+        }
+        var social = $.getUrlParam('social');
+        if (social) {
+            window.location.replace(app.ConfigApp.projectFolder + 'social');
+        }
     };
     LibraryApp.viewSocial = function(socialName){
-        //console.log("view " + socialName);
         //console.log("Current fragment: " + Backbone.history.getFragment());
         var sessionSocialStatus = app.SessionHelper.getItem("status:" + socialName);
         if (sessionSocialStatus === "false" || sessionSocialStatus == "null" || $.inArray(socialName, app.ConfigApp.socialArray) == -1) {
@@ -147,8 +137,13 @@ app.LibraryApp = function(){
             pair = queryString[i].split('=');
             params[d(pair[0])] = d(pair[1]);
         }
-        //console.log(params['social']);
         return params;
+    };
+    LibraryApp.logout = function() {
+        var sessionId = $.cookie('social_session_id');
+        $.removeCookie(sessionId);
+        $.removeCookie('social_session_id');
+        $.removeCookie('social_session_token');
     };
     return LibraryApp;
 }();

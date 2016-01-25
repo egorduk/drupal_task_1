@@ -13,17 +13,55 @@ function main_menu() {
         'page callback' => 'drupal_get_form',
         'access callback' => TRUE,
         'page arguments' => array('main_user_login_form')
+    );
+    $items['user/1/social'] = array(
+        'title' => 'Social aggregator',
+        'page callback' => 'main_page_callback',
+        //'access arguments' => array('access content'),
+        'access callback' => TRUE,
+        //'access arguments' => array('all'),
+        //'access arguments' => array('administer site configuration'),
+        'file' => 'main.pages.inc'
     );*/
     $items['social'] = array(
         'title' => 'Social aggregator',
         'page callback' => 'main_page_callback',
-        //'access callback' => TRUE,
-        'access arguments' => array('access content'),
-        //'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+        'access callback' => TRUE,
         'file' => 'main.pages.inc'
     );
     return $items;
 }
+
+/*function main_permission() {
+    return array(
+        'all' => array(
+            'title' => t('Access for all'),
+            'description' => t(''),
+        ),
+    );
+}*/
+
+/*function main_preprocess_page(&$variables) {
+    //var_dump($variables['user']->roles);die;
+    //if(!$variables['user']->uid && arg(0)!='user' && arg(1)!='login') {
+    if (arg(0) == 'user' && arg(1) == 'piy') {
+        //var_dump($variables['user']);die;
+        drupal_goto('user/piy');
+    }
+}*/
+
+/*function main_preprocess_node(&$variables) {
+    $node = $variables['node'];
+    var_dump($node);die;
+    switch ($node->type) {
+        case 'profile':
+            if (arg(0) == 'node' && arg(1) == $node->nid && arg(2) == "") {
+                // If we are postitive we are on node/N where N is the NID of a profile
+                // node, then redirect to the user profile page instead.
+                drupal_goto("user/$node->uid");
+            }
+    }
+}*/
 
 function main_page_callback() {
     $module_path = drupal_get_path('module', 'main');
@@ -42,7 +80,7 @@ function main_page_callback() {
                 array('data' => $module_path . '/js/app_second.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/app_viewer.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/app_routing.js', 'type' => 'file', 'scope' => 'footer'),
-                array('data' => $module_path . '/js/app_closer.js', 'type' => 'file', 'scope' => 'footer'),
+                /*array('data' => $module_path . '/js/app_closer.js', 'type' => 'file', 'scope' => 'footer'),*/
                 array('data' => $module_path . '/js/app_start.js', 'type' => 'file', 'scope' => 'footer')
             ),
             'css' => array(
@@ -56,18 +94,32 @@ function main_page_callback() {
         ),
     );
     //$content['#attached']['css'][] = $module_path . '/css/style.css';
-    $content['#attached']['css']['.socialDetail {border:1px solid black;width:600px;height:auto} .post-detail {border: 1px solid black;} #block-user-login {display: none;}'] = array( 'type' => 'inline');
-    $loginForm = drupal_get_form('user_login');
-    $loginForm = drupal_render($loginForm);
+    $content['#attached']['css']['
+    #block-user-login {display: none;}
+    #mainContainer table tr:nth-child(even) {background: #f3f4ee}
+    #mainContainer table tr:nth-child(odd) {background: #fff}
+    #mainContainer .post-detail {border: 1px solid black;}
+    #mainContainer .social-detail {width:100%; border:1px solid black; height:auto}
+    #mainContainer .social-detail div:nth-child(even) {background: #f3f4ee}
+    #mainContainer .social-detail div:nth-child(odd) {background: #fff}
+    #mainContainer .panel-new-post {float:right; margin-top:10px; width:40%; margin-right:15px;}
+    #mainContainer .posts-wrapper {float:left; width:55%;}
+    #mainContainer #login-form {float:left; margin-left:600px;}
+    #mainContainer #reg-form {float:right; width:50%;}
+    #noticeContainer {color:white; text-align:center;}
+    #noticeContainer .notice-error {background:red;}
+    #noticeContainer .notice-success {background:green;}
+    #noticeContainer .notice-warning {background:orange;}
+    '] = array( 'type' => 'inline');
     $regForm = drupal_get_form('main_user_register_form');
     $regForm = drupal_render($regForm);
     $content['#markup'] = '
      <script type="text/template" id="notice-item"></script>
-     <!--<div id="menu">
-         <a href="#main" class="js-menu-main">Main</a>
+     <div id="menu">
+         <!--<a href="#main" class="js-menu-main">Main</a>
          <a href="#feeds" class="js-menu-feeds">Feeds</a>
-         <a href="http://localhost/drupal_task_1/user/test" class="js-menu-exit">Exit</a>
-     </div>-->
+         <a href="http://localhost/drupal_task_1/user/test" class="js-menu-exit">Exit</a>-->
+     </div>
      <div id="content1"></div>
      <div id="modal"></div>
      <!--<script type="text/template" id="layout-template">
@@ -75,15 +127,21 @@ function main_page_callback() {
      <script type="text/template" id="layout-template">
          <div id="noticeContainer"></div>
          <div id="mainContainer"></div>
-         <div id="modalContainer"></div>
      </script>
      <script type="text/template" id="auth-template">
-         <div id="login-form">' . $loginForm . '</div>
-            <!--<label for="edit-name">Login <span title="This field is required." class="form-required">*</span></label>
-            <input type="text" class="form-text required" maxlength="60" size="60" value="" name="name" id="login-username">
-            <label for="edit-pass">Password <span title="This field is required." class="form-required">*</span></label>
-            <input type="password" class="form-text required" maxlength="60" size="60" name="pass" id="login-password">
-            <input type="submit" class="form-submit" value="Log in" id="login-submit">-->
+         <div id="login-form">
+            <form>
+                <div class="form-item form-type-textfield form-item-login">
+                    <label for="edit-name">Login <span title="This field is required." class="form-required">*</span></label>
+                    <input type="text" class="form-text required" maxlength="15" size="30" value="" name="name" id="login-username">
+                </div>
+                <div class="form-item form-type-textfield form-item-login">
+                    <label for="edit-pass">Password <span title="This field is required." class="form-required">*</span></label>
+                    <input type="password" class="form-text required" maxlength="15" size="30" name="pass" id="login-password">
+                </div>
+                <p><input type="submit" class="form-submit" value="Log in" id="login-submit"></p>
+            </form>
+         </div>
          <div id="reg-form">' . $regForm . '</div>
      </script>
      <script type="text/template" id="list-template">
@@ -99,9 +157,6 @@ function main_page_callback() {
          <td><%=name%></td>
          <td></td>
      </script>
-     <script type="text/template" id="close-template">
-         <p>That\'s all, folks !</p>
-     </script>
      <script type="text/template" id="social-item-template">
          <div class="post-detail">
              <div class="content"><%=content%></div>
@@ -109,12 +164,13 @@ function main_page_callback() {
          </div>
      </script>
      <script type="text/template" id="social-list-template">
-         <a class="close" data-dismiss="modal" href="#">x</a>
-         <div class="user_name"></div>
+         <a class="close" href="#">x</a>
+         <div class="user-name"></div>
          <div class="panel-new-post">
-             <textarea placeholder="Комментировать" class="text-new-post"></textarea>
-             <button class="add-new-post">Отправить</button>
+             <textarea placeholder="Text" class="text-new-post form-textarea" cols="100" rows="10"></textarea>
+             <p><input class="add-new-post form-submit" value="Post"></input></p>
          </div>
+         <div class="posts-wrapper"></div>
      </script>
      ';
     return $content;
@@ -238,7 +294,7 @@ function main_user_login_form($form, &$form_state) {
     return $form;
 }
 
-function main_perm() {
+/*function main_perm() {
     return array(
         'note resource create',
         'note resource view any note',
@@ -248,7 +304,7 @@ function main_perm() {
         'note resource delete any note',
         'note resource delete own notes',
     );
-}
+}*/
 
 function main_get_note($id) {
     return (db_query("SELECT * FROM {note} WHERE id=:id", array(
@@ -269,121 +325,12 @@ function main_delete_note($id) {
 
 function main_services_resources() {
     return array(
-        'note' => array(
-            'retrieve' => array(
-                'help' => 'Retrieves a note',
-                'file' => array('file' => 'inc', 'module' => 'main'),
-                'callback' => '_main_retrieve',
-                //'access callback' => '_main_access',
-                //'access callback' => TRUE,
-                //'access arguments' => array('administer site configuration'),
-                //'access arguments' => array('view'),
-                //'access arguments' => TRUE,
-                //'access arguments append' => TRUE,
-                'args' => array(
-                    array(
-                        'name' => 'id',
-                        'type' => 'int',
-                        'description' => 'The id of the note to get',
-                        'source' => array('path' => '0'),
-                        'optional' => FALSE,
-                    ),
-                ),
-            ),
-            'create' => array(
-                'help' => 'Creates a note',
-                'file' => array('file' => 'inc', 'module' => 'source'),
-                'callback' => '_noteresource_create',
-                'access arguments' => array('note resource create'),
-                'access arguments append' => FALSE,
-                'args' => array(
-                    array(
-                        'name' => 'data',
-                        'type' => 'struct',
-                        'description' => 'The note object',
-                        'source' => 'data',
-                        'optional' => FALSE,
-                    ),
-                ),
-            ),
-            'update' => array(
-                'help' => 'Updates a note',
-                'file' => array('file' => 'inc', 'module' => 'source'),
-                'callback' => '_noteresource_update',
-                'access callback' => '_noteresource_access',
-                'access arguments' => array('update'),
-                'access arguments append' => TRUE,
-                'args' => array(
-                    array(
-                        'name' => 'id',
-                        'type' => 'int',
-                        'description' => 'The id of the node to update',
-                        'source' => array('path' => '0'),
-                        'optional' => FALSE,
-                    ),
-                    array(
-                        'name' => 'data',
-                        'type' => 'struct',
-                        'description' => 'The note data object',
-                        'source' => 'data',
-                        'optional' => FALSE,
-                    ),
-                ),
-            ),
-            'delete' => array(
-                'help' => 'Deletes a note',
-                'file' => array('file' => 'inc', 'module' => 'source'),
-                'callback' => '_noteresource_delete',
-                'access callback' => '_noteresource_access',
-                'access arguments' => array('delete'),
-                'access arguments append' => TRUE,
-                'args' => array(
-                    array(
-                        'name' => 'nid',
-                        'type' => 'int',
-                        'description' => 'The id of the note to delete',
-                        'source' => array('path' => '0'),
-                        'optional' => FALSE,
-                    ),
-                ),
-            ),
-            'index' => array(
-                'help' => 'Retrieves a listing of notes',
-                'file' => array('file' => 'inc', 'module' => 'main'),
-                'callback' => '_main_index',
-                'access callback' => '_main_access',
-                'access arguments' => array('access content'),
-                'access arguments append' => FALSE,
-                'args' => array(
-                    array(
-                        'name' => 'page',
-                        'type' => 'int',
-                        'description' => '',
-                        'source' => array(
-                            'param' => 'page',
-                        ),
-                        'optional' => TRUE,
-                        'default value' => 0,
-                    ),
-                    array(
-                        'name' => 'parameters',
-                        'type' => 'array',
-                        'description' => '',
-                        'source' => 'param',
-                        'optional' => TRUE,
-                        'default value' => array(),
-                    ),
-                ),
-            ),
-        ),
         'social' => array(
             'index' => array(
                 'help' => 'Retrieves a listing of socials',
                 'file' => array('file' => 'inc', 'module' => 'main'),
                 'callback' => '_main_get_socials',
-                'access arguments' => array('administer site configuration'),
-               // 'access arguments append' => TRUE,
-                //'args' => array()
+                'access arguments' => array('access content'),
                 'args' => array(
                     array(
                         'name' => 'mode',
@@ -398,9 +345,7 @@ function main_services_resources() {
                 'help' => 'Updates a social status',
                 'file' => array('file' => 'inc', 'module' => 'main'),
                 'callback' => '_main_update',
-                'access arguments' => array('administer site configuration'),
-                //'access arguments' => TRUE,
-                //'access arguments append' => TRUE,
+                'access arguments' => array('access content'),
                 'args' => array(
                     array(
                         'name' => 'id',
@@ -417,7 +362,7 @@ function main_services_resources() {
                 'help' => 'Retrieves a listing of posts',
                 'file' => array('file' => 'inc', 'module' => 'main'),
                 'callback' => '_main_get_posts',
-                'access arguments' => array('administer site configuration'),
+                'access arguments' => array('access content'),
                 'args' => array(
                     array(
                         'name' => 'mode',
@@ -439,8 +384,7 @@ function main_services_resources() {
                 'help' => 'Creates new post',
                 'file' => array('file' => 'inc', 'module' => 'main'),
                 'callback' => '_main_public_post',
-                'access arguments' => array('administer site configuration'),
-                //'access arguments append' => FALSE,
+                'access arguments' => array('access content'),
                 'args' => array(
                     array(
                         'name' => 'data',

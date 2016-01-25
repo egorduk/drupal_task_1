@@ -11,8 +11,9 @@ app.SocialViewer = function(){
     });
     var SocialDetailListView = Backbone.Marionette.CompositeView.extend({
         template: "#social-list-template",
-        className: "modal socialDetail",
+        className: "social-detail",
         childView: SocialDetailItemView,
+        childViewContainer: ".posts-wrapper",
         events: {
             'click .add-new-post': 'addNewPost'
         },
@@ -27,19 +28,16 @@ app.SocialViewer = function(){
             var post = new app.LibraryApp.PostModel({
                 content: postText,
                 date_post: new Date().getCurrentFormatedDate(),
-                author: '',
                 social_name: app.LibraryApp.PostCollection.socialName
             });
             textareaEl.val("");
             post.save({}, {
                 success: function (model, response) {
-                    //console.log("Success", response);
                     NoticeView.viewNotice('Done!', 'success');
                     app.LibraryApp.PostCollection.add(model, {at: 0});
                 },
                 error: function (model, response) {
                     NoticeView.viewNotice('Something wrong', 'error');
-                    //console.log("Error", response);
                 }
             });
         },
@@ -49,28 +47,35 @@ app.SocialViewer = function(){
         onRender: function() {
             //console.log('SocialDetailListView: onRender');
         },
+        /* onAfterRender: function() {
+         var self = this;
+         app.vent.on("test", function(){
+         self.$el.find('.posts-wrapper').find('div:first').addClass('new');
+         });
+         },*/
         hidePostPanel: function(socialName) {
             var panelNewPost = this.$el.find('.panel-new-post');
             (socialName === 'instagram') ? panelNewPost.hide() : panelNewPost.show();
         }
+        /*collectionEvents: {
+         "add": "modelAdded"
+         },
+         modelAdded: function() {
+         app.vent.trigger("test");
+         }*/
     });
     var NoticeView = new app.NoticeView();
     var SocialRowView = Backbone.Marionette.ItemView.extend({
-        //template: "#item-template",
         template: _.template($('#item-template').html()),
         tagName: "tr",
         initialize: function() {
             //console.log('SocialRowView: initialize');
-            this.listenTo(this.model, 'change', this.change);
-            this.listenTo(this.model, 'destroy', this.destroy);
+            //this.listenTo(this.model, 'change', this.change);
+            //this.listenTo(this.model, 'destroy', this.destroy);
         },
         events: {
-            'click .reset': 'onClickReset'
+            'click .reset': 'clickReset'
         },
-        /*showBookDetail: function(){
-            var detailView = new BookDetailView({model: this.model});
-            app.modal.show(detailView);
-        },*/
         onRender: function() {
             var statusCell = this.$el.find("td").eq(1),
                 socialName = this.model.get("name"),
@@ -83,86 +88,70 @@ app.SocialViewer = function(){
                 statusCell.html('<span class="status-false"></span><a href="' + socialSyncLink + '">Sync</a>');
             console.log('SocialRowView: onRender');
         },
-        change: function () {
-            //console.log('SocialRowView: change');
-            //this.render();
-        },
-        destroy: function() {
-            //console.log('SocialRowView: destroy');
-        },
-        onClickReset: function () {
+        //change: function () {
+        //console.log('SocialRowView: change');
+        //this.render();
+        //},
+        //destroy: function() {
+        //console.log('SocialRowView: destroy');
+        //},
+        clickReset: function () {
             var self = this;
             self.model.save({'status': null}, {
-                success: function (model, response) {
-                    //NoticeView.viewNotice(response.responseText, 'success');
-                    console.log('Success: ' + response.result);
+                success: function(model, response) {
                     if (response.result) {
+                        NoticeView.viewNotice('Done', 'success');
                         self.render();
                         app.SessionHelper.setItem("status:" + self.model.get("name"), self.model.get("status"));
                     }
                 },
-                error: function (model, response) {
-                    //NoticeView.viewNotice(response.responseText, 'error');
-                    console.log('Error: ' + response.result);
+                error: function(model, response) {
+                    if (response.hasOwnProperty('responseText') && response.responseText != "") {
+                        NoticeView.viewNotice($.parseJSON(response.responseText)[0], 'error');
+                    } else {
+                        NoticeView.viewNotice('Something wrong', 'error');
+                    }
                 },
                 wait: true
             });
-        },
-        onClickView: function() {
-            //var posts = new app.LibraryApp.Post();
-            //var socialView = new SocialView({ collection: posts});
-            //app.modal.show(socialView);
         }
     });
     var SocialListView = Backbone.Marionette.CompositeView.extend({
         tagName: "table",
         template: "#list-template",
-        //class: "",
         childView: SocialRowView,
+        onBeforeRender: function() {
+            app.menu.showLogout('<a id="link-logout" href="' + app.ConfigApp.projectFolder + 'user/logout">Logout</a>');
+        }
     });
-    var SearchView = Backbone.View.extend({
+    /*var searchview = Backbone.View.extend({
         el: "#searchBar",
         initialize: function(){
             var self = this;
             var $spinner = self.$('#spinner');
             app.vent.on("search:start", function(){ $spinner.fadeIn(); });
             app.vent.on("search:stop", function(){ $spinner.fadeOut(); });
-            app.vent.on("search:term", function(term){
-                self.$('#searchTerm').val(term);
-            });
-        },
-        events: {
-            'change #searchTerm': 'search'
-        },
-        search: function() {
-            var searchTerm = this.$('#searchTerm').val().trim();
-            if(searchTerm.length > 0){
-                app.vent.trigger("search:term", searchTerm);
-            } else {
-                app.vent.trigger("search:noSearchTerm");
-            }
         }
-    });
+    });*/
     var AuthView = Backbone.Marionette.ItemView.extend({
         template: "#auth-template",
         events: {
-            'click #edit-submit': 'loginSubmit',
-            'click #reg-submit': 'regSubmit',
-            'click #link-logout': 'logout'
+            'click #login-submit': 'loginSubmit',
+            'click #reg-submit': 'regSubmit'
         },
         userModel: '',
         sessionId: '',
         initialize: function() {
-            console.log('AuthView: initialize');
+            //console.log('AuthView: initialize');
             this.userModel = new app.LibraryApp.UserModel();
         },
         onRender: function() {
-            console.log('AuthView: onRender');
+            // console.log('AuthView: onRender');
         },
         loginSubmit: function(e) {
             e.preventDefault();
-            var username = this.$el.find('#edit-name').val(),
-                password = this.$el.find('#edit-pass').val();
+            var username = this.$el.find('#login-username').val(),
+                password = this.$el.find('#login-password').val();
             this.userModel.set({ username: username, password: password });
             var self = this;
             self.fetchUser();
@@ -184,43 +173,48 @@ app.SocialViewer = function(){
         fetchUser: function() {
             var self = this;
             this.userModel.fetch({}).fail(function(response){
-                console.log(response);
-                NoticeView.viewNotice('Something wrong', 'error');
-            }).done(function(response) {
-                console.log(response);
-                if (response.hasOwnProperty('session_name') && response.hasOwnProperty('sessid')) {
-                    self.sessionId = response.session_name;
-                    $.cookie(self.sessionId, response.sessid);
-                    self.hideAuthPanels();
-                    self.showLogoutLink();
+                if (response.hasOwnProperty('responseText') && response.responseText != "") {
+                    NoticeView.viewNotice($.parseJSON(response.responseText)[0], 'error');
                 } else {
                     NoticeView.viewNotice('Something wrong', 'error');
+                }
+            }).done(function(response) {
+                if (response.hasOwnProperty('session_name') && response.hasOwnProperty('sessid') && response.hasOwnProperty('token')) {
+                    self.sessionId = response.session_name;
+                    $.cookie(self.sessionId, response.sessid);
+                    $.cookie('social_session_id', self.sessionId);
+                    $.cookie('social_session_token', response.token);
+                    self.hideAuthPanels();
+                    app.SocialViewer.showTableSocial(app.LibraryApp.SocialCollection);
+                    app.vent.trigger("social:getSocials");
+                } else {
+                    NoticeView.viewNotice(response[0], 'error');
                 }
             });
         },
         regUser: function() {
+            var self = this;
             this.userModel.save({}, {
-                success: function (model, response) {
+                success: function () {
                     NoticeView.viewNotice('Created! Please log in using your new account', 'success');
+                    self.clearFields();
                 },
                 error: function (model, response) {
-                    console.log("Error", response);
+                    if (response.hasOwnProperty('responseText') && response.responseText != "") {
+                        NoticeView.viewNotice($.parseJSON(response.responseText)[0], 'error');
+                    } else {
+                        NoticeView.viewNotice('Something wrong', 'error');
+                    }
                 }
             });
         },
         hideAuthPanels: function() {
             this.$el.empty();
+            NoticeView.closeNotice();
         },
-        showAuthPanels: function() {
-            this.render();
-        },
-        showLogoutLink: function() {
-            this.$el.html('<a id="link-logout" href="' + app.ConfigApp.projectFolder + 'user/logout">Logout</a>');
-        },
-        logout: function(e) {
-            e.preventDefault();
-            $.removeCookie(this.sessionId);
-            this.showAuthPanels();
+        clearFields: function() {
+            this.$el.find('input[type="text"]').val("");
+            this.$el.find('input[type="password"]').val("");
         }
     });
 
@@ -229,27 +223,16 @@ app.SocialViewer = function(){
         app.LibraryApp.layout.mainContainer.show(socialListView);
     };
     SocialViewer.showSocialDetails = function(posts, socialName){
-        //console.log(posts);
         var socialDetailView = new SocialDetailListView({ collection: posts });
-        //console.log(socialDetailView);
-        //app.modal.show(socialDetailView);
-        //socialDetailView.render();
         app.LibraryApp.layout.mainContainer.show(socialDetailView);
         socialDetailView.hidePostPanel(socialName);
     };
+    //SocialViewer.authView = new AuthView();
     SocialViewer.showAuth = function(){
-        //console.log(posts);
-        var a = new AuthView();
-        //console.log(socialDetailView);
-        //app.modal.show(socialDetailView);
-        //socialDetailView.render();
-        app.LibraryApp.layout.mainContainer.show(a);
+        app.SocialViewer.authView = new AuthView();
+        //console.log(app.SocialViewer.authView);
+        app.LibraryApp.layout.mainContainer.show(app.SocialViewer.authView);
     };
-    //app.vent.on("layout:rendered", function(){
-        // render a view for the existing HTML in the template, and attach it to the layout (i.e. don't double render)
-        //var searchView = new SearchView();
-        //app.LibraryApp.layout.search.attachView(searchView);
-    //});
     return SocialViewer;
 }();
 
@@ -263,10 +246,10 @@ Date.prototype.toMysqlFormat = function() {
 };
 
 Date.prototype.getCurrentFormatedDate = function() {
-    var today = new Date();
-    var dd = today.getDate();
-    var mm = today.getMonth() + 1;
-    var yyyy = today.getFullYear();
+    var today = new Date(),
+        dd = today.getDate(),
+        mm = today.getMonth() + 1,
+        yyyy = today.getFullYear();
     if (dd < 10) {
         dd = '0' + dd
     }
@@ -274,4 +257,13 @@ Date.prototype.getCurrentFormatedDate = function() {
         mm = '0' + mm
     }
     return dd + '/' + mm + '/' + yyyy;
+};
+
+$.getUrlParam = function(name) {
+    var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+    if (results == null) {
+        return null;
+    } else {
+        return results[1] || 0;
+    }
 };

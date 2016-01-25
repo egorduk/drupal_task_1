@@ -5,7 +5,7 @@ use Abraham\TwitterOAuth\TwitterOAuth;
 
 define("TWITTER_CONSUMER_KEY", "Jt4lGWjVOJqvUalFyv911Dbkr");
 define("TWITTER_CONSUMER_SECRET", "LU32tiMn5NmCHzlfMTgFrmJjnPXsaaAfqQNTefdnoR1e3pcXqo");
-define("TWITTER_OAUTH_CALLBACK", "http://localhost/drupal_task_1/user/test?social=twitter");
+define("TWITTER_OAUTH_CALLBACK", "http://localhost/drupal_task_1/social?social=twitter");
 
 function twitter_entity_info() {
     $return = array(
@@ -97,7 +97,6 @@ function twitter_reset($id) {
         ->condition('user_id', $user->uid)
         ->condition('tid', $id)
         ->execute();
-    //return 1;
 }
 
 function twitter_get_posts() {

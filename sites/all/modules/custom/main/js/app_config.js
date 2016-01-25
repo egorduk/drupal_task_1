@@ -8,5 +8,6 @@ app.ConfigApp = function(){
     ConfigApp.urlSocial = ConfigApp.projectFolder + "notes/social";
     ConfigApp.urlUser = ConfigApp.projectFolder + "notes/auth";
     ConfigApp.socialArray = ['twitter', 'facebook', 'instagram'];
+    ConfigApp.initLayout = 0;
     return ConfigApp;
 }();

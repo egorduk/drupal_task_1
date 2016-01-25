@@ -3,7 +3,7 @@ use MetzWeb\Instagram\Instagram;
 
 define("INSTAGRAM_ID", "0a8c859217034967b1aec64ee5a1d9fc");
 define("INSTAGRAM_SECRET", "65bf77bcf7dc42d3b55e39b88e19b983");
-define("INSTAGRAM_CALLBACK", "http://localhost/drupal_task_1/user/test?social=instagram");
+define("INSTAGRAM_CALLBACK", "http://localhost/drupal_task_1/social?social=instagram");
 
 function instagram_entity_info() {
     $return = array(
@@ -89,7 +89,6 @@ function instagram_get_posts() {
         ->condition('user_id', $user->uid)
         ->execute()
         ->fetchField();
-    //var_dump($instagramData);die;
     $module_path = drupal_get_path('module', 'instagram');
     require_once $module_path . '/Instagram/src/Instagram.php';
     $instagram = new Instagram(array(
@@ -103,7 +102,7 @@ function instagram_get_posts() {
     foreach($posts->data as $index => $post) {
         $text = isset($post->caption->text) ? $post->caption->text : '';
         $parsedPosts[$index]['date_post'] = date('d/m/Y', $post->created_time);
-        $parsedPosts[$index]['content'] = $post->images->standard_resolution->url . ' - ' . $text;
+        $parsedPosts[$index]['content'] = '<img src="' . $post->images->standard_resolution->url . '"></img><p>' . $text . '</p>';
         $parsedPosts[$index]['author'] = $post->user->username . ' - ' . $post->user->full_name;
     }
     return $parsedPosts;
