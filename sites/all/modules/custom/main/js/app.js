@@ -1,37 +1,12 @@
 /* create a new instance of the Marionette app */
 
 var app = new Backbone.Marionette.Application();
-/*var ModalRegion = Backbone.Marionette.Region.extend({
- el: "#modal",
- constructor: function(){
- //_.bindAll(this);
- Backbone.Marionette.Region.prototype.constructor.apply(this, arguments);
- this.on("show", this.showModal, this);
- },
- getEl: function(selector){
- var $el = $(selector);
- $el.on("hidden", this.close);
- return $el;
- },
- showModal: function(view){
- view.on("close", this.hideModal, this);
- //this.$el.modal('show');
- },
- hideModal: function(){
- this.$el.modal('hide');
- }
- });*/
 
 app.addRegions({
     menuRegion: '#menu',
-    contentRegion: '#content1',
-    modal: '#modal'
-    //modal: ModalRegion
+    contentRegion: '#content-wrapper'
 });
-/*Backbone.sync = function(method, model) {
- alert(method + ": " + JSON.stringify(model));
- model.set('id', 1);
- };*/
+
 app.MenuView = Backbone.Marionette.View.extend({
     el: "#menu",
     events: {
@@ -58,6 +33,7 @@ app.MenuView = Backbone.Marionette.View.extend({
         this.$el.empty();
     }
 });
+
 app.NoticeView = Backbone.Marionette.ItemView.extend({
     template: "#notice-item",
     notice: '',
@@ -69,13 +45,10 @@ app.NoticeView = Backbone.Marionette.ItemView.extend({
         this.closeNotice();
         this.$el.addClass('notice-' + this.type);
         this.$el.html(this.notice);
-        console.log(this.$el);
     },
     closeNotice: function() {
         this.$el.empty();
-        this.$el.removeClass('notice-error');
-        this.$el.removeClass('notice-success');
-        this.$el.removeClass('notice-warning');
+        this.$el.removeClass();
     },
     viewNotice: function(notice, type) {
         this.notice = notice;

@@ -115,13 +115,8 @@ function main_page_callback() {
     $regForm = drupal_render($regForm);
     $content['#markup'] = '
      <script type="text/template" id="notice-item"></script>
-     <div id="menu">
-         <!--<a href="#main" class="js-menu-main">Main</a>
-         <a href="#feeds" class="js-menu-feeds">Feeds</a>
-         <a href="http://localhost/drupal_task_1/user/test" class="js-menu-exit">Exit</a>-->
-     </div>
-     <div id="content1"></div>
-     <div id="modal"></div>
+     <div id="menu"></div>
+     <div id="content-wrapper"></div>
      <!--<script type="text/template" id="layout-template">
              <img src="" alt="Loading..." id="spinner" />-->
      <script type="text/template" id="layout-template">

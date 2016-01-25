@@ -152,6 +152,10 @@ app.SocialViewer = function(){
             e.preventDefault();
             var username = this.$el.find('#login-username').val(),
                 password = this.$el.find('#login-password').val();
+            if (username == "" || password == "") {
+                NoticeView.viewNotice('Missing attribute', 'warning');
+                return;
+            }
             this.userModel.set({ username: username, password: password });
             var self = this;
             self.fetchUser();
@@ -162,6 +166,10 @@ app.SocialViewer = function(){
                 email = this.$el.find('#reg-email').val(),
                 password = this.$el.find('#reg-pass').val(),
                 approvePassword = this.$el.find('#reg-approve-pass').val();
+            if (username == "" || password == "" || email == "" || approvePassword == "") {
+                NoticeView.viewNotice('Missing attribute', 'warning');
+                return;
+            }
             this.userModel = new app.LibraryApp.UserModel({
                 username: username,
                 password: password,
