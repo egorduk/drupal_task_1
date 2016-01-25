@@ -99,11 +99,18 @@ function main_page_callback() {
     #mainContainer table tr:nth-child(even) {background: #f3f4ee}
     #mainContainer table tr:nth-child(odd) {background: #fff}
     #mainContainer .post-detail {border: 1px solid black;}
-    #mainContainer .social-detail {width:100%; border:1px solid black; height:auto}
-    #mainContainer .social-detail div:nth-child(even) {background: #f3f4ee}
-    #mainContainer .social-detail div:nth-child(odd) {background: #fff}
+    #mainContainer .social-detail {width:100%; border:none; height:auto}
+    //#mainContainer .social-detail div:nth-child(even) {background: #f3f4ee}
+    //#mainContainer .social-detail div:nth-child(odd) {background: #fff}
     #mainContainer .panel-new-post {float:right; margin-top:10px; width:40%; margin-right:15px;}
-    #mainContainer .posts-wrapper {float:left; width:55%;}
+    #mainContainer .posts-wrapper {float:left; width:55%; margin-top:10px;}
+    #mainContainer .posts-wrapper div {background-color: #f8f8f8;
+        background-image: url("' . $module_path . '/css/rssinclude_item_bg.gif");
+        background-repeat: repeat-x;
+        border-bottom: 1px solid #c0c0c0;
+        border-left: 1px solid #c0c0c0;
+        border-right: 1px solid #c0c0c0;
+        padding: 10px;}
     #mainContainer #login-form {float:left; margin-left:600px;}
     #mainContainer #reg-form {float:right; width:50%;}
     #noticeContainer {color:white; text-align:center;}
@@ -159,11 +166,11 @@ function main_page_callback() {
          </div>
      </script>
      <script type="text/template" id="social-list-template">
-         <a class="close" href="#">x</a>
+         <a class="close" href="#">Close x</a>
          <div class="user-name"></div>
          <div class="panel-new-post">
              <textarea placeholder="Text" class="text-new-post form-textarea" cols="100" rows="10"></textarea>
-             <p><input class="add-new-post form-submit" value="Post"></input></p>
+             <p><input class="add-new-post form-submit" value="Post"></p>
          </div>
          <div class="posts-wrapper"></div>
      </script>

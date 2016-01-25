@@ -1,6 +1,7 @@
 <?php
 function facebook_uninstall() {
     drupal_uninstall_schema('facebook');
+     //variable_del('mymodule_var');
 }
 
 function facebook_schema() {
@@ -21,6 +22,8 @@ function facebook_schema() {
     return $schema;
 }
 
-function facebook_install() {
-    drupal_install_schema('facebook');
+function facebook_enable() {
+    if (!db_table_exists('facebook')) {
+        drupal_install_schema('facebook');
+    }
 }

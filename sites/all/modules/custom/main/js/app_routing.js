@@ -1,4 +1,4 @@
-app.AppRouting = function(){
+app.AppRouting = function() {
     var AppRouting = {};
     AppRouting.Router = Backbone.Marionette.AppRouter.extend({
         appRoutes: {
@@ -6,7 +6,7 @@ app.AppRouting = function(){
             "view/:socialName" : "viewSocial"
         }
     });
-    app.addInitializer(function(){
+    app.addInitializer(function() {
         AppRouting.router = new AppRouting.Router({
             controller: app.LibraryApp
         });

@@ -100,7 +100,7 @@ app.SocialViewer = function(){
             self.model.save({'status': null}, {
                 success: function(model, response) {
                     if (response.result) {
-                        NoticeView.viewNotice('Done', 'success');
+                        NoticeView.viewNotice('Done!', 'success');
                         self.render();
                         app.SessionHelper.setItem("status:" + self.model.get("name"), self.model.get("status"));
                     }
@@ -192,9 +192,13 @@ app.SocialViewer = function(){
                     $.cookie(self.sessionId, response.sessid);
                     $.cookie('social_session_id', self.sessionId);
                     $.cookie('social_session_token', response.token);
+                    if (response.hasOwnProperty('user')) {
+                        var username = response.user.name;
+                    }
                     self.hideAuthPanels();
-                    app.SocialViewer.showTableSocial(app.LibraryApp.SocialCollection);
-                    app.vent.trigger("social:getSocials");
+                    app.LibraryApp.home();
+                    //app.SocialViewer.showTableSocial(app.LibraryApp.SocialCollection);
+                    //app.vent.trigger("social:getSocials");
                 } else {
                     NoticeView.viewNotice(response[0], 'error');
                 }

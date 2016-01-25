@@ -89,9 +89,9 @@ app.LibraryApp = function(){
         }
     });
     LibraryApp.SocialCollection = new SocialCollection();
-    LibraryApp.initializeLayout = function(){
+    LibraryApp.initializeLayout = function() {
         LibraryApp.layout = new Layout();
-        LibraryApp.layout.on("show", function(){
+        LibraryApp.layout.on("show", function() {
             app.vent.trigger("layout: rendered");
         });
         app.contentRegion.show(app.LibraryApp.layout);
@@ -113,7 +113,7 @@ app.LibraryApp = function(){
             window.location.replace(app.ConfigApp.projectFolder + 'social');
         }
     };
-    LibraryApp.viewSocial = function(socialName){
+    LibraryApp.viewSocial = function(socialName) {
         //console.log("Current fragment: " + Backbone.history.getFragment());
         var sessionSocialStatus = app.SessionHelper.getItem("status:" + socialName);
         if (sessionSocialStatus === "false" || sessionSocialStatus == "null" || $.inArray(socialName, app.ConfigApp.socialArray) == -1) {

@@ -1,5 +1,3 @@
-/* create a new instance of the Marionette app */
-
 var app = new Backbone.Marionette.Application();
 
 app.addRegions({
@@ -56,12 +54,12 @@ app.NoticeView = Backbone.Marionette.ItemView.extend({
         app.LibraryApp.layout.noticeContainer.show(this.render());
     }
 });
-app.vent.on("layout: rendered", function(){
-    //console.log("Layout: rendered");
+app.vent.on("layout: rendered", function() {
+    console.log("Layout: rendered");
     app.menu = new app.MenuView();
     //app.menuRegion.attachView(app.menu);
 });
-app.vent.on("routing: started", function(){
+app.vent.on("routing: started", function() {
     app.SessionHelper = window.sessionStorage;
     //console.log("Routing: started");
     if (!Backbone.History.started) {
