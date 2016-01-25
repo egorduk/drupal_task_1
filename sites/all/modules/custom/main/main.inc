@@ -27,7 +27,6 @@ function _main_update($id) {
     $typeSocial = _main_get_type_social_by_id($id);
     $recordId = _main_parse_social_id($id);
     return (object)array('result' => _main_reset_social($typeSocial, $recordId));
-    //return true;
 }
 
 function _main_reset_social($typeSocial, $recordId) {
@@ -180,38 +179,30 @@ function _main_auth_user($mode, $data) {
     if (isset($data) &&  is_array($data)) {
         $data = (object)$data;
     }
-    if (!isset($data->username) || !isset($data->password)) {
-        return services_error('Missing attribute', 406);
+    if (!isset($data->username) || !isset($data->password) || $data->username == "" || $data->password == "") {
+        return services_error('Missing attribute, check your data', 406);
     }
     $base_url = 'http://localhost/drupal_task_1/notes';
     $data = array(
         'username' => $data->username,
         'password' => $data->password,
     );
-    //$data = drupal_json_encode($data);
     $data = http_build_query($data, '', '&');
     $options = array(
         $headers = array('Content-Type' => 'application/x-www-form-urlencoded'),
-        //$headers = array('Content-Type' => 'application/json'),
         'method' => 'POST',
         'data' => $data
     );
     $response = drupal_http_request($base_url . '/user/login', $options);
-    //$data = json_decode($response->data);
-    return (json_decode($response->data));
-// Check if login was successful
-    if ($response->code == 200) {
-    } else {
-        return services_error('Missing attribute', 404);
-    }
+    return json_decode($response->data);
 }
 
 function _main_auth_create_user($data) {
-    if (isset($data) &&  is_array($data)) {
+    if (isset($data) && is_array($data)) {
         $data = (object)$data;
     }
-    if (!isset($data->username) || !isset($data->email) || !isset($data->password) || !isset($data->approve_password)) {
-        return services_error('Missing attribute', 406);
+    if (!isset($data->username) || $data->username == "" || !isset($data->email) || !isset($data->password) || !isset($data->approve_password)) {
+        return services_error('Missing attribute, check your data', 406);
     }
     if (!valid_email_address($data->email)) {
         return services_error('Incorrect email', 406);
@@ -229,7 +220,5 @@ function _main_auth_create_user($data) {
         'created' => REQUEST_TIME
     );
     user_save(null, $newUser);
-    //drupal_set_message("Successful registration.");
-    //return services_error('Success', 200);
     return true;
 }

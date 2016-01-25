@@ -7,7 +7,7 @@ if (isset($_REQUEST['social']) && $_REQUEST['social'] == 'twitter' && isset($_RE
     $request_token = [];
     $request_token['oauth_token'] = $_SESSION['oauth_token'];
     $request_token['oauth_token_secret'] = $_SESSION['oauth_token_secret'];
-    $connection = new \Abraham\TwitterOAuth\TwitterOAuth(CONSUMER_KEY, CONSUMER_SECRET, $request_token['oauth_token'], $request_token['oauth_token_secret']);
+    $connection = new \Abraham\TwitterOAuth\TwitterOAuth(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, $request_token['oauth_token'], $request_token['oauth_token_secret']);
     $access_token = $connection->oauth("oauth/access_token", array("oauth_verifier" => $_REQUEST['oauth_verifier']));
     $arrayData['oauth_token'] = $access_token['oauth_token'];
     $arrayData['oauth_token_secret'] = $access_token['oauth_token_secret'];
