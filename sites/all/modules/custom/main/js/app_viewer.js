@@ -1,5 +1,6 @@
 app.SocialViewer = function(){
     var SocialViewer = {};
+    var username = '';
     var SocialDetailItemView = Backbone.Marionette.ItemView.extend({
         template: "#social-item-template",
         initialize: function(){
@@ -121,7 +122,8 @@ app.SocialViewer = function(){
         template: "#list-template",
         childView: SocialRowView,
         onBeforeRender: function() {
-            app.menu.showLogout('<a id="link-logout" href="' + app.ConfigApp.projectFolder + 'user/logout">Logout</a>');
+            app.menu.showLogout('<a class="link-logout" href="' + app.ConfigApp.projectFolder + 'user/logout">Logout</a>');
+            app.menu.showUsername('<span class="username">' + username + '</span>');
         }
     });
     /*var searchview = Backbone.View.extend({
@@ -192,8 +194,8 @@ app.SocialViewer = function(){
                     $.cookie(self.sessionId, response.sessid);
                     $.cookie('social_session_id', self.sessionId);
                     $.cookie('social_session_token', response.token);
-                    if (response.hasOwnProperty('user')) {
-                        var username = response.user.name;
+                    if (response.hasOwnProperty('user')){
+                        username = response.user.name;
                     }
                     self.hideAuthPanels();
                     app.LibraryApp.home();

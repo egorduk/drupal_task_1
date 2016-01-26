@@ -8,18 +8,21 @@ app.addRegions({
 app.MenuView = Backbone.Marionette.View.extend({
     el: "#menu",
     events: {
-        'click #link-logout': 'logoutClick'
+        'click .link-logout': 'logoutClick'
     },
-    showMainPage: function(e) {
+    /*showMainPage: function(e) {
         e.preventDefault();
         app.LibraryApp.home();
     },
     showFeedsPage: function(e) {
         e.preventDefault();
         app.Closer.close();
-    },
+    },*/
     showLogout: function(link) {
         this.$el.html(link);
+    },
+    showUsername: function(username) {
+        this.$el.append('<br>' + 'Hello, ' + username);
     },
     logoutClick: function(e) {
         e.preventDefault();
