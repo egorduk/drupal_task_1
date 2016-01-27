@@ -117,15 +117,17 @@ function main_page_callback() {
     #noticeContainer .notice-error {background:red;}
     #noticeContainer .notice-success {background:green;}
     #noticeContainer .notice-warning {background:orange;}
+    #spinner {text-align:center; display:none;}
     '] = array( 'type' => 'inline');
     $regForm = drupal_get_form('main_user_register_form');
     $regForm = drupal_render($regForm);
     $content['#markup'] = '
      <script type="text/template" id="notice-item"></script>
      <div id="menu"></div>
+     <div id="spinner">
+        <img src="' . $module_path . '/images/loading.gif" alt="Loading..." />
+     </div>
      <div id="content-wrapper"></div>
-     <!--<script type="text/template" id="layout-template">
-             <img src="" alt="Loading..." id="spinner" />-->
      <script type="text/template" id="layout-template">
          <div id="noticeContainer"></div>
          <div id="mainContainer"></div>
@@ -254,7 +256,7 @@ function main_user_register_form_validate($form, &$form_state) {
     }
     if ($form_state['values']['password'] != $form_state['values']['password_approve']) {
         form_set_error('password_approve', t('Passwords are not equal'));
-        //form_set_error('password', t('Passwords don\'t. equal'));
+        form_set_error('password', t('Passwords are not equal'));
     }
 }
 

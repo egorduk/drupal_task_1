@@ -1,5 +1,6 @@
 app.LibraryApp = function(){
     var LibraryApp = {},
+        NoticeView = new app.NoticeView(),
         Layout = Backbone.Marionette.LayoutView.extend({
             template: "#layout-template",
             regions: {
@@ -55,12 +56,16 @@ app.LibraryApp = function(){
             var self = this;
             this.socialName = options.socialName;
             app.vent.on("post:getPosts", function(){
+                app.spinnerShow();
                 self.fetchPosts();
             });
         },
         fetchPosts: function() {
-            this.fetch({}).fail(function(){}).done(function(a) {
+            this.fetch({}).fail(function(){
+                NoticeView.viewNotice('Something wrong', 'error');
+            }).done(function(a) {
                 console.log(a);
+                app.spinnerHide();
             });
         }
     });
@@ -76,11 +81,15 @@ app.LibraryApp = function(){
             console.log('SocialCollection: initialize');
             var self = this;
             app.vent.on("social:getSocials", function(){
+                app.spinnerShow();
                 self.fetchSocials();
             });
         },
         fetchSocials: function() {
-            this.fetch({}).fail(function(){}).done(function(data) {
+            this.fetch({}).fail(function() {
+               // NoticeView.viewNotice('Something wrong', 'error');
+            }).done(function(data) {
+               app.spinnerHide();
                 console.log(data);
                 _(data).each(function(item) {
                     app.SessionHelper.setItem("status:" + item.name, item.status);
@@ -115,8 +124,13 @@ app.LibraryApp = function(){
     };
     LibraryApp.viewSocial = function(socialName) {
         //console.log("Current fragment: " + Backbone.history.getFragment());
-        var sessionSocialStatus = app.SessionHelper.getItem("status:" + socialName);
-        if (sessionSocialStatus === "false" || sessionSocialStatus == "null" || $.inArray(socialName, app.ConfigApp.socialArray) == -1) {
+        if ($.cookie('social_session_id')) {
+            var sessionSocialStatus = app.SessionHelper.getItem("status:" + socialName);
+            if (sessionSocialStatus === "false" || sessionSocialStatus == "null" || $.inArray(socialName, app.ConfigApp.socialArray) == -1) {
+                Backbone.history.navigate("");
+                return;
+            }
+        } else {
             Backbone.history.navigate("");
             return;
         }
@@ -144,6 +158,8 @@ app.LibraryApp = function(){
         $.removeCookie(sessionId);
         $.removeCookie('social_session_id');
         $.removeCookie('social_session_token');
+        Backbone.history.navigate("");
+        app.SessionHelper.clear
     };
     return LibraryApp;
 }();

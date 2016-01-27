@@ -21,9 +21,6 @@ app.MenuView = Backbone.Marionette.View.extend({
     showLogout: function(link) {
         this.$el.html(link);
     },
-    showUsername: function(username) {
-        this.$el.append('<br>' + 'Hello, ' + username);
-    },
     logoutClick: function(e) {
         e.preventDefault();
         app.LibraryApp.logout();
@@ -57,11 +54,21 @@ app.NoticeView = Backbone.Marionette.ItemView.extend({
         app.LibraryApp.layout.noticeContainer.show(this.render());
     }
 });
+
+app.spinnerShow = function() {
+    $("#spinner").show();
+};
+
+app.spinnerHide = function() {
+    $("#spinner").hide();
+};
+
 app.vent.on("layout: rendered", function() {
     console.log("Layout: rendered");
     app.menu = new app.MenuView();
     //app.menuRegion.attachView(app.menu);
 });
+
 app.vent.on("routing: started", function() {
     app.SessionHelper = window.sessionStorage;
     //console.log("Routing: started");

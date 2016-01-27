@@ -1,6 +1,5 @@
 app.SocialViewer = function(){
     var SocialViewer = {};
-    var username = '';
     var SocialDetailItemView = Backbone.Marionette.ItemView.extend({
         template: "#social-item-template",
         initialize: function(){
@@ -26,6 +25,7 @@ app.SocialViewer = function(){
                 NoticeView.viewNotice('Too little message (need more then 3 letters)', 'warning');
                 return;
             }
+            app.spinnerShow();
             var post = new app.LibraryApp.PostModel({
                 content: postText,
                 date_post: new Date().getCurrentFormatedDate(),
@@ -34,7 +34,8 @@ app.SocialViewer = function(){
             textareaEl.val("");
             post.save({}, {
                 success: function (model, response) {
-                    NoticeView.viewNotice('Done!', 'success');
+                    app.spinnerHide();
+                    NoticeView.viewNotice('Posted!', 'success');
                     app.LibraryApp.PostCollection.add(model, {at: 0});
                 },
                 error: function (model, response) {
@@ -123,18 +124,8 @@ app.SocialViewer = function(){
         childView: SocialRowView,
         onBeforeRender: function() {
             app.menu.showLogout('<a class="link-logout" href="' + app.ConfigApp.projectFolder + 'user/logout">Logout</a>');
-            app.menu.showUsername('<span class="username">' + username + '</span>');
         }
     });
-    /*var searchview = Backbone.View.extend({
-        el: "#searchBar",
-        initialize: function(){
-            var self = this;
-            var $spinner = self.$('#spinner');
-            app.vent.on("search:start", function(){ $spinner.fadeIn(); });
-            app.vent.on("search:stop", function(){ $spinner.fadeOut(); });
-        }
-    });*/
     var AuthView = Backbone.Marionette.ItemView.extend({
         template: "#auth-template",
         events: {
@@ -172,6 +163,7 @@ app.SocialViewer = function(){
                 NoticeView.viewNotice('Missing attribute', 'warning');
                 return;
             }
+            app.spinnerShow();
             this.userModel = new app.LibraryApp.UserModel({
                 username: username,
                 password: password,
@@ -181,6 +173,7 @@ app.SocialViewer = function(){
             this.regUser();
         },
         fetchUser: function() {
+            app.spinnerShow();
             var self = this;
             this.userModel.fetch({}).fail(function(response){
                 if (response.hasOwnProperty('responseText') && response.responseText != "") {
@@ -189,14 +182,12 @@ app.SocialViewer = function(){
                     NoticeView.viewNotice('Something wrong', 'error');
                 }
             }).done(function(response) {
+                app.spinnerHide();
                 if (response.hasOwnProperty('session_name') && response.hasOwnProperty('sessid') && response.hasOwnProperty('token')) {
                     self.sessionId = response.session_name;
                     $.cookie(self.sessionId, response.sessid);
                     $.cookie('social_session_id', self.sessionId);
                     $.cookie('social_session_token', response.token);
-                    if (response.hasOwnProperty('user')){
-                        username = response.user.name;
-                    }
                     self.hideAuthPanels();
                     app.LibraryApp.home();
                     //app.SocialViewer.showTableSocial(app.LibraryApp.SocialCollection);
@@ -210,6 +201,7 @@ app.SocialViewer = function(){
             var self = this;
             this.userModel.save({}, {
                 success: function () {
+                    app.spinnerHide();
                     NoticeView.viewNotice('Created! Please log in using your new account', 'success');
                     self.clearFields();
                 },
