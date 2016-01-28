@@ -159,7 +159,7 @@ app.LibraryApp = function(){
         $.removeCookie('social_session_id');
         $.removeCookie('social_session_token');
         Backbone.history.navigate("");
-        app.SessionHelper.clear
+        //app.SessionHelper.clear
     };
     return LibraryApp;
 }();

@@ -3,6 +3,7 @@ app.AppRouting = function() {
     AppRouting.Router = Backbone.Marionette.AppRouter.extend({
         appRoutes: {
             "": "home",
+            "_=_": "home",  // root for facebook redirect
             "view/:socialName" : "viewSocial"
         }
     });

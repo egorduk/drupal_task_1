@@ -1,5 +1,7 @@
 <?php
 
+define('BASE_URL_AUTH', 'http://localhost/drupal_task_1/notes');
+
 function _main_create($data) {
     global $user;
     if (isset($data) &&  is_array($data)) $data=(object) $data;
@@ -182,7 +184,6 @@ function _main_auth_user($mode, $data) {
     if (!isset($data->username) || !isset($data->password) || $data->username == "" || $data->password == "") {
         return services_error('Missing attribute, check your data', 406);
     }
-    $base_url = 'http://localhost/drupal_task_1/notes';
     $data = array(
         'username' => $data->username,
         'password' => $data->password,
@@ -193,7 +194,7 @@ function _main_auth_user($mode, $data) {
         'method' => 'POST',
         'data' => $data
     );
-    $response = drupal_http_request($base_url . '/user/login', $options);
+    $response = drupal_http_request(BASE_URL_AUTH . '/user/login', $options);
     return json_decode($response->data);
 }
 

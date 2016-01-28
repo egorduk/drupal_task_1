@@ -4,8 +4,8 @@
 define("FACEBOOK_APP_ID", "1640010319548174");
 //define("FACEBOOK_APP_SECRET", "1e121667b64b99f97148211d7df38a60");
 define("FACEBOOK_APP_SECRET", "7d64b5c69e9b6759bf781fb4a4868622");
-//define("FACEBOOK_APP_REDIRECT_URL", "http://localhost/drupal_task_1/user/test?social=facebook");
-define("FACEBOOK_APP_REDIRECT_URL", "http://drupaltask.esy.es/project/user/test?social=facebook");
+define("FACEBOOK_APP_REDIRECT_URL", "http://localhost/drupal_task_1/social?social=facebook");
+//define("FACEBOOK_APP_REDIRECT_URL", "http://drupaltask.esy.es/project/user/test?social=facebook");
 define("FACEBOOK_DIALOG_URL", "https://www.facebook.com/dialog/oauth");
 define("FACEBOOK_FEED", "https://graph.facebook.com/me/feed");
 
@@ -96,17 +96,19 @@ function facebook_get_posts() {
         ->condition('user_id', $user->uid)
         ->execute()
         ->fetchField();
-    $params = array('access_token' => $facebookAccessToken);
-    $feeds = json_decode(file_get_contents(FACEBOOK_FEED . '?' . urldecode(http_build_query($params))), true);
-    /*$parsedFeeds = [];
+    $module_path = drupal_get_path('module', 'facebook');
+    require_once $module_path . '/FacebookHelper.php';
+    $fbHelper = new FacebookHelper();
+    $fbHelper->setAccessToken($facebookAccessToken);
+    $feeds = $fbHelper->getFeeds();
+    //var_dump($feeds);die;
+    $parsedFeeds = [];
     foreach($feeds->data as $index => $feed) {
         $text = isset($feed->message) ? $feed->message : $feed->story;
         $parsedFeeds[$index]['date_post'] = date('d/m/Y', $feed->created_time);
         $parsedFeeds[$index]['content'] = $text;
-        $parsedFeeds[$index]['author'] = '';
     }
-    return $parsedFeeds;*/
-    var_dump($feeds);die;
+    return $parsedFeeds;
 }
 
 function facebook_public_post($data) {
@@ -116,11 +118,12 @@ function facebook_public_post($data) {
         ->condition('user_id', $user->uid)
         ->execute()
         ->fetchField();
-    $params = array('access_token' => $facebookAccessToken);
-    /*$module_path = drupal_get_path('module', 'facebook');
+    $module_path = drupal_get_path('module', 'facebook');
     require_once $module_path . '/FacebookHelper.php';
-    $a = new FacebookHelper();
-    var_dump($a->curlRequest(FACEBOOK_FEED . '?message=test&access_token=' . urldecode(http_build_query($params)), 'POST'));*/
+    $fbHelper = new FacebookHelper();
+    $fbHelper->setAccessToken($facebookAccessToken);
+    $fbHelper->postMessage(array('message' => $data->content));
+    return true;
 }
 
 function facebook_reset($id) {

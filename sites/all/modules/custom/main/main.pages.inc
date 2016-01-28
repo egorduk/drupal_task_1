@@ -30,32 +30,18 @@ if (isset($_REQUEST['social']) && $_REQUEST['social'] == 'twitter' && isset($_RE
     $arrayData['social'] = 'instagram';
     main_save_social_data($arrayData);
 } elseif (isset($_REQUEST['social']) && $_REQUEST['social'] == 'facebook' && isset($_REQUEST['code'])) {
-    /*$result = false;
-    $params = array(
-        'client_id'     => FACEBOOK_APP_ID,
-        'redirect_uri'  => FACEBOOK_APP_REDIRECT_URL,
-        'client_secret' => FACEBOOK_APP_SECRET,
-        'code'          => $_REQUEST['code']
-    );
-    $url = 'https://graph.facebook.com/oauth/access_token';
-    $tokenInfo = null;
-    parse_str(file_get_contents($url . '?' . http_build_query($params)), $tokenInfo);
-    if (count($tokenInfo) > 0 && isset($tokenInfo['access_token'])) {
-        $params = array('access_token' => $tokenInfo['access_token']);
-        $arrayData['access_token'] = $tokenInfo['access_token'];
-        $arrayData['social'] = 'facebook';*/
-       // $a->getAccessToken();
     $module_path = drupal_get_path('module', 'facebook');
     require_once $module_path . '/FacebookHelper.php';
-    $a = new FacebookHelper();
-    var_dump($a->getAccessToken());
-        //main_save_social_data($arrayData);
-        //var_dump($params);
-        /*$userInfo = json_decode(file_get_contents('https://graph.facebook.com/me' . '?' . urldecode(http_build_query($params))), true);
-        dpm($userInfo);
-        $feed = json_decode(file_get_contents('https://graph.facebook.com/me/feed' . '?' . urldecode(http_build_query($params))), true);
-        dpm($feed);
-    }*/
+    $fbHelper = new FacebookHelper();
+    $accessToken = $fbHelper->getAccessToken();
+    //var_dump($fbHelper->getFeeds());
+    //var_dump($fbHelper->getPermissions());
+    //$arr = [];
+    //$arr['message'] = $_REQUEST['code'];
+    //var_dump($fbHelper->postMessage($arr));
+    $arrayData['social'] = 'facebook';
+    $arrayData['access_token'] = $accessToken;
+    main_save_social_data($arrayData);
 } else {
 
 }
