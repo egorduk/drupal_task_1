@@ -2,13 +2,7 @@
 
 class InstagramController extends EntityAPIController {
     public function create(array $values = array()) {
-        //$product_data = $values['product_data'];
-        //$file = $values['file'];
-        $values += array(
-            'user_id' => '',
-            'user_login' => '',
-            'user_pass' => '',
-        );
+        $values += array();
         return parent::create($values);
     }
 }

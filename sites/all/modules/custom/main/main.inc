@@ -1,157 +1,67 @@
 <?php
 
-define('BASE_URL_AUTH', 'http://localhost/drupal_task_1/notes');
+require_once "SocialStrategyContext.php";
 
-function _main_create($data) {
-    global $user;
-    if (isset($data) &&  is_array($data)) $data=(object) $data;
-    unset($data->id);
-    $data->uid = $user->uid;
-    $data->created = time();
-    $data->modified = time();
-    if (!isset($data->subject)) {
-        return services_error('Missing note attribute subject', 406);
-    }
-    if (!isset($data->note)) {
-        return services_error('Missing note attribute note', 406);
-    }
-    main_write_note($data);
-    return (object)array(
-        'id' => $data->id,
-        'uri' => services_resource_uri(array('note', $data->id)),
-    );
-}
-
-function _main_update($id) {
+function _main_reset_social($id) {
     if (!isset($id)) {
         return services_error('Missing id', 406);
     }
     $typeSocial = _main_get_type_social_by_id($id);
     $recordId = _main_parse_social_id($id);
-    return (object)array('result' => _main_reset_social($typeSocial, $recordId));
-}
-
-function _main_reset_social($typeSocial, $recordId) {
-    if ($typeSocial == 'twitter') {
-        return twitter_reset($recordId);
-    } elseif ($typeSocial == 'facebook') {
-        return facebook_reset($recordId);
-    } elseif ($typeSocial == 'instagram') {
-        return instagram_reset($recordId);
-    } else {
-
-    }
+    $socialStrategyContext = new SocialStrategyContext($typeSocial);
+    return ($socialStrategyContext->resetUserSocial($recordId)) ? (object)(array('responseText' => true)) : services_error('Not implemented', 501);
 }
 
 function _main_parse_social_id($id) {
     return str_replace($id[0], '', $id);
 }
 
-function _main_retrieve($id) {
-    return main_get_note($id);
-}
-
-function _main_delete($id) {
-    main_delete_note($id);
-    return (object)array(
-        'id' => $id,
-    );
-}
-
-function _main_index($page, $parameters) {
-    global $user;
-    $notes = array();
-    $res = db_query('SELECT * FROM {note} WHERE uid=:uid ORDER BY modified DESC',
-        array(':uid' => $user->uid));
-    foreach ($res as $note) {
-        $notes[] = $note;
-    }
-    return $notes;
-}
-
-function _main_access($op, $args) {
-    global $user;
-    /*$access = FALSE;
-    switch ($op) {
-        case 'view':
-            $note = main_get_note($args[0]);
-            $access = user_access('note resource view any note');
-            $access = $access || $note->uid == $user->uid && user_access('note resource view own notes');
-            break;
-        case 'update':
-            $note = main_get_note($args[0]->id);
-            $access = user_access('note resource edit any note');
-            $access = $access || $note->uid == $user->uid && user_access('note resource edit own notes');
-            break;
-        case 'delete':
-            $note = main_get_note($args[0]);
-            $access = user_access('note resource delete any note');
-            $access = $access || $note->uid == $user->uid && user_access('note resource delete own notes');
-            break;
-    }*/
-    $access = TRUE;
-    return $access;
-
-}
-
 function _main_get_socials($mode) {
     if ($mode == 'get_socials') {
-        $arr = [];
-        $twitterStatus = $twitterId = getTwitterAccount();
-        $fbStatus = $fbId = getFacebookAccount();
-        $instagramStatus = $instagramId = getInstagramAccount();
-        $arr[] = array('name' => 'twitter', 'status' => (bool)$twitterStatus, 'sync_link' => twitter_get_auth_link(), 'id' => 't' . $twitterId);
-        $arr[] = array('name' => 'facebook', 'status' => (bool)$fbStatus, 'sync_link' => facebook_get_auth_link(), 'id' => 'f' . $fbId);
-        $arr[] = array('name' => 'instagram', 'status' => (bool)$instagramStatus, 'sync_link' => instagram_get_auth_link(), 'id' => 'i' . $instagramId);
-        return ($arr);
+        $responseArray = [];
+        $twitterStatus = $twitterId = _main_get_twitter_account_data();
+        $fbStatus = $fbId = _main_get_facebook_account_data();
+        $instagramStatus = $instagramId = _main_get_instagram_account_data();
+        $responseArray[] = array('name' => 'twitter', 'status' => (bool)$twitterStatus, 'sync_link' => twitter_get_auth_link(), 'id' => 't' . $twitterId);
+        $responseArray[] = array('name' => 'facebook', 'status' => (bool)$fbStatus, 'sync_link' => facebook_get_auth_link(), 'id' => 'f' . $fbId);
+        $responseArray[] = array('name' => 'instagram', 'status' => (bool)$instagramStatus, 'sync_link' => instagram_get_auth_link(), 'id' => 'i' . $instagramId);
+        return $responseArray;
     }
-    return 'Error';
+    return services_error('Not implemented', 501);
 }
 
-function _main_get_posts($mode, $typeSocial) {
-    if ($mode == 'get_posts') {
-        $posts = _main_get_social_posts($typeSocial);
+function _main_get_social_posts($mode, $typeSocial) {
+    if ($mode === 'get_posts' && _main_is_correct_social_type($typeSocial)) {
+        $socialStrategyContext = new SocialStrategyContext($typeSocial);
+        $posts = $socialStrategyContext->getUserSocialPosts();
         return $posts;
     }
-    return 'Error';
+    return services_error('Not implemented', 501);
 }
 
-function _main_get_social_posts($typeSocial) {
-    $arr = [];
-    if ($typeSocial == 'twitter') {
-        return twitter_get_posts();
-    } elseif ($typeSocial == 'facebook') {
-        return facebook_get_posts();
-    } elseif ($typeSocial == 'instagram') {
-        return instagram_get_posts();
-    } else {
-
-    }
-    return $arr;
-}
-
-function getTwitterAccount() {
+function _main_get_twitter_account_data() {
     return twitter_load_by_user();
 }
 
-function getInstagramAccount() {
+function _main_get_instagram_account_data() {
     return instagram_load_by_user();
 }
 
-function getFacebookAccount() {
+function _main_get_facebook_account_data() {
     return facebook_load_by_user();
 }
 
 function _main_get_type_social_by_id($id) {
     $firstLetter = $id[0];
     $typeSocial = '';
-    if ($firstLetter == 'i') {
+    if ($firstLetter === 'i') {
         $typeSocial = 'instagram';
-    } elseif ($firstLetter == 't') {
+    } elseif ($firstLetter === 't') {
         $typeSocial = 'twitter';
-    } elseif ($firstLetter == 'f') {
+    } elseif ($firstLetter === 'f') {
         $typeSocial = 'facebook';
     } else {
+        return services_error('Incorrect social type', 400);
     }
     return $typeSocial;
 }
@@ -163,39 +73,37 @@ function _main_public_post($data) {
     if (!isset($data->content) || !isset($data->date_post) || !isset($data->social_name)) {
         return services_error('Missing attribute', 406);
     }
-    //$typeSocial = _main_get_type_social_by_id($data->id);
-    $typeSocial = $data->social_name;
-    if ($typeSocial == 'twitter') {
-        return twitter_public_post($data);
-    } elseif ($typeSocial == 'facebook') {
-        return facebook_public_post($data);
-    } elseif ($typeSocial == 'instagram') {
-        //return instagram_get_posts();
-    } else {
-
+    if (!_main_is_correct_social_type($data->social_name)) {
+        return services_error('Incorrect social type', 400);
     }
-    return true;
+    $typeSocial = $data->social_name;
+    $socialStrategyContext = new SocialStrategyContext($typeSocial);
+    return ($socialStrategyContext->publishUserPost($data)) ? true : services_error('Publishing error', 501);
 }
 
 function _main_auth_user($mode, $data) {
-    if (isset($data) &&  is_array($data)) {
-        $data = (object)$data;
+    if ($mode === 'user_login') {
+        if (isset($data) &&  is_array($data)) {
+            $data = (object)$data;
+        }
+        if (!isset($data->username) || !isset($data->password) || $data->username == "" || $data->password == "") {
+            return services_error('Missing attribute, check your data', 406);
+        }
+        $data = array(
+            'username' => $data->username,
+            'password' => $data->password,
+        );
+        $data = http_build_query($data, '', '&');
+        $options = array(
+            $headers = array('Content-Type' => 'application/x-www-form-urlencoded'),
+            'method' => 'POST',
+            'data' => $data
+        );
+        $response = drupal_http_request(variable_get_value('social_aggregator:BASE_URL_AUTH') . '/user/login', $options);
+        return json_decode($response->data);
+    } else {
+        return services_error('Not implemented', 501);
     }
-    if (!isset($data->username) || !isset($data->password) || $data->username == "" || $data->password == "") {
-        return services_error('Missing attribute, check your data', 406);
-    }
-    $data = array(
-        'username' => $data->username,
-        'password' => $data->password,
-    );
-    $data = http_build_query($data, '', '&');
-    $options = array(
-        $headers = array('Content-Type' => 'application/x-www-form-urlencoded'),
-        'method' => 'POST',
-        'data' => $data
-    );
-    $response = drupal_http_request(BASE_URL_AUTH . '/user/login', $options);
-    return json_decode($response->data);
 }
 
 function _main_auth_create_user($data) {
@@ -211,15 +119,28 @@ function _main_auth_create_user($data) {
     if ($data->password != $data->approve_password) {
         return services_error('Passwords are not equal', 406);
     }
-    $newUser = array(
-        'name' => $data->username,
-        'pass' => $data->password,
-        'mail' => $data->email,
-        'init' => $data->email,
-        'status' => 1,
-        'access' => REQUEST_TIME,
-        'created' => REQUEST_TIME
-    );
-    user_save(null, $newUser);
-    return true;
+    if (!user_load_by_name($data->username) && !user_load_by_mail($data->email)) {
+        $newUser = array(
+            'name' => $data->username,
+            'pass' => $data->password,
+            'mail' => $data->email,
+            'init' => $data->email,
+            'status' => 1,
+            'access' => REQUEST_TIME,
+            'created' => REQUEST_TIME
+        );
+        return (user_save(null, $newUser)) ? true : services_error('Not implemented', 501);
+    } else {
+        return services_error('There is user with such username or email', 501);
+    }
+}
+
+function _main_is_correct_social_type($socialType) {
+    return in_array($socialType, ['twitter', 'facebook', 'instagram']);
+}
+
+function _main_save_social_data($arrayData) {
+    $typeSocial = $arrayData['social'];
+    $socialStrategyContext = new SocialStrategyContext($typeSocial);
+    return $socialStrategyContext->saveUserSocialData($arrayData);
 }

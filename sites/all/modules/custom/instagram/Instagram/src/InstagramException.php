@@ -1,7 +1,6 @@
 <?php
 
-namespace MetzWeb\Instagram;
+namespace Instagram;
 
-class InstagramException extends \Exception
-{
+class InstagramException extends \Exception {
 }

@@ -10,48 +10,17 @@ app.MenuView = Backbone.Marionette.View.extend({
     events: {
         'click .link-logout': 'logoutClick'
     },
-    /*showMainPage: function(e) {
-        e.preventDefault();
-        app.LibraryApp.home();
-    },
-    showFeedsPage: function(e) {
-        e.preventDefault();
-        app.Closer.close();
-    },*/
     showLogout: function(link) {
         this.$el.html(link);
     },
     logoutClick: function(e) {
         e.preventDefault();
-        app.LibraryApp.logout();
+        app.SocialModeler.logout();
         app.SocialViewer.showAuth();
         this.hideLogout();
     },
     hideLogout: function() {
         this.$el.empty();
-    }
-});
-
-app.NoticeView = Backbone.Marionette.ItemView.extend({
-    template: "#notice-item",
-    notice: '',
-    type: '',
-    events: {
-        'click': 'closeNotice'
-    },
-    onRender: function() {
-        this.closeNotice();
-        this.$el.addClass('notice-' + this.type);
-        this.$el.html(this.notice);
-    },
-    closeNotice: function() {
-        this.$el.empty();
-        this.$el.removeClass();
-    },
-    viewNotice: function(notice, type) {
-        this.notice = notice;
-        this.type = type;
-        app.LibraryApp.layout.noticeContainer.show(this.render());
     }
 });
 
@@ -63,15 +32,15 @@ app.spinnerHide = function() {
     $("#spinner").hide();
 };
 
-app.vent.on("layout: rendered", function() {
+app.vent.on("layout:rendered", function() {
     console.log("Layout: rendered");
     app.menu = new app.MenuView();
-    //app.menuRegion.attachView(app.menu);
 });
 
-app.vent.on("routing: started", function() {
+app.vent.on("routing:started", function() {
     app.SessionHelper = window.sessionStorage;
-    //console.log("Routing: started");
+    app.SocialViewer.initializeLayout();
+    console.log("Routing: started");
     if (!Backbone.History.started) {
         Backbone.history.start();
     }
@@ -79,6 +48,3 @@ app.vent.on("routing: started", function() {
         alert('No Web Storage support');
     }
 });
-
-//app.module('App', function(module, App, Backbone, Marionette, $, _){
-//    module.SocialModel = Backbone.Model.extend({

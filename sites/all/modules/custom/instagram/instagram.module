@@ -1,9 +1,8 @@
 <?php
-use MetzWeb\Instagram\Instagram;
 
-define("INSTAGRAM_ID", "0a8c859217034967b1aec64ee5a1d9fc");
-define("INSTAGRAM_SECRET", "65bf77bcf7dc42d3b55e39b88e19b983");
-define("INSTAGRAM_CALLBACK", "http://localhost/drupal_task_1/social?social=instagram");
+require "Instagram/autoload.php";
+
+use Instagram\Instagram;
 
 function instagram_entity_info() {
     $return = array(
@@ -13,7 +12,7 @@ function instagram_entity_info() {
             'controller class' => 'InstagramController',
             'base table' => 'instagram',
             'fieldable' => TRUE,
-            'load hook' => 'instagram_load',
+            //'load hook' => 'instagram_load',
             'module' => 'instagram',
             'entity keys' => array(
                 'id' => 'iid',
@@ -42,33 +41,16 @@ function instagram_entity_info() {
 
 
 function instagram_menu() {
-    $items['admin/config/instagram'] = array(
-        'title callback' => '',
-        //'title arguments' => array('twitter', 1),
-        'page callback' => 'instagram_page_view',
-        //'page arguments' => array(1),
-        //'access callback' => TRUE,
-        'access arguments' => array('administer site configuration'),
-        'file' => 'instagram.pages.inc',
-    );
-    return $items;
-}
-
-function instagram_load($twitter_id, $reset = FALSE) {
-    $products = instagram_load_multiple(array($twitter_id), array(), $reset);
-    return $products ? reset($products) : FALSE;
-}
-
-function instagram_load_multiple($product_ids = array(), $conditions = array(), $reset = FALSE) {
-    return entity_load('instagram', $product_ids, $conditions, $reset);
+    return array();
 }
 
 function instagram_get_auth_link() {
-    require_once 'Instagram/src/Instagram.php';
+    $module_path = drupal_get_path('module', 'instagram');
+    require_once $module_path . '/Instagram/src/Instagram.php';
     $instagram = new Instagram(array(
-        'apiKey'      => INSTAGRAM_ID,
-        'apiSecret'   => INSTAGRAM_SECRET,
-        'apiCallback' => INSTAGRAM_CALLBACK
+        'apiKey'      => variable_get_value('social_aggregator:INSTAGRAM_ID'),
+        'apiSecret'   => variable_get_value('social_aggregator:INSTAGRAM_SECRET'),
+        'apiCallback' => variable_get_value('social_aggregator:INSTAGRAM_CALLBACK')
     ));
     $link = $instagram->getLoginUrl();
     return $link;
@@ -92,9 +74,9 @@ function instagram_get_posts() {
     $module_path = drupal_get_path('module', 'instagram');
     require_once $module_path . '/Instagram/src/Instagram.php';
     $instagram = new Instagram(array(
-        'apiKey'      => INSTAGRAM_ID,
-        'apiSecret'   => INSTAGRAM_SECRET,
-        'apiCallback' => INSTAGRAM_CALLBACK
+        'apiKey'      => variable_get_value('social_aggregator:INSTAGRAM_ID'),
+        'apiSecret'   => variable_get_value('social_aggregator:INSTAGRAM_SECRET'),
+        'apiCallback' => variable_get_value('social_aggregator:INSTAGRAM_CALLBACK')
     ));
     $instagram->setAccessToken($instagramAccessToken);
     $posts = $instagram->getUserMedia();
@@ -113,5 +95,16 @@ function instagram_reset($id) {
     return db_delete('instagram')
         ->condition('user_id', $user->uid)
         ->condition('iid', $id)
+        ->execute();
+}
+
+function instagram_save_user_data($arrayData) {
+    global $user;
+    return db_insert('instagram')
+        ->fields(array('user_id', 'access_token'))
+        ->values(array(
+            'user_id' => $user->uid,
+            'access_token' => $arrayData['access_token']
+        ))
         ->execute();
 }

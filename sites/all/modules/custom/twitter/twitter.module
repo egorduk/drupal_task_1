@@ -1,11 +1,8 @@
 <?php
 
-require "twitter_api/autoload.php";
-use Abraham\TwitterOAuth\TwitterOAuth;
+require "Twitter/autoload.php";
 
-define("TWITTER_CONSUMER_KEY", "Jt4lGWjVOJqvUalFyv911Dbkr");
-define("TWITTER_CONSUMER_SECRET", "LU32tiMn5NmCHzlfMTgFrmJjnPXsaaAfqQNTefdnoR1e3pcXqo");
-define("TWITTER_OAUTH_CALLBACK", "http://localhost/drupal_task_1/social?social=twitter");
+use Twitter\TwitterOAuth;
 
 function twitter_entity_info() {
     $return = array(
@@ -15,7 +12,7 @@ function twitter_entity_info() {
             'controller class' => 'TwitterController',
             'base table' => 'twitter',
             'fieldable' => TRUE,
-            'load hook' => 'twitter_load',
+            //'load hook' => 'twitter_load',
             'module' => 'twitter',
             'entity keys' => array(
                 'id' => 'tid',
@@ -42,37 +39,18 @@ function twitter_entity_info() {
     return $return;
 }
 
-
 function twitter_menu() {
-    $items['admin/config/twitter/%twitter'] = array(
-        'title callback' => 'entity_label',
-        //'title arguments' => array('twitter', 1),
-        'page callback' => 'twitter_page_view',
-        'page arguments' => array(1),
-        //'access callback' => TRUE,
-        'access arguments' => array('administer site configuration'),
-        'file' => 'twitter.pages.inc',
-    );
-    $items['admin/config/twitter'] = array(
-        'title callback' => '',
-        //'title arguments' => array('twitter', 1),
-        'page callback' => 'twitter_page_view',
-        //'page arguments' => array(1),
-        //'access callback' => TRUE,
-        'access arguments' => array('administer site configuration'),
-        'file' => 'twitter.pages.inc',
-    );
-    return $items;
+    return array();
 }
 
-function twitter_load($twitter_id, $reset = FALSE) {
+/*function twitter_load($twitter_id, $reset = FALSE) {
     $products = twitter_load_multiple(array($twitter_id), array(), $reset);
     return $products ? reset($products) : FALSE;
 }
 
 function twitter_load_multiple($product_ids = array(), $conditions = array(), $reset = FALSE) {
     return entity_load('twitter', $product_ids, $conditions, $reset);
-}
+}*/
 
 function twitter_load_by_user() {
     global $user;
@@ -83,8 +61,11 @@ function twitter_load_by_user() {
 }
 
 function twitter_get_auth_link() {
-    $connection = new TwitterOAuth(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET);
-    $request_token = $connection->oauth('oauth/request_token', array('oauth_callback' => TWITTER_OAUTH_CALLBACK));
+    $consumerKey = variable_get_value('social_aggregator:TWITTER_CONSUMER_KEY');
+    $consumerSecret = variable_get_value('social_aggregator:TWITTER_CONSUMER_SECRET');
+    $redirectUrl = variable_get_value('social_aggregator:TWITTER_OAUTH_CALLBACK');
+    $connection = new TwitterOAuth($consumerKey, $consumerSecret);
+    $request_token = $connection->oauth('oauth/request_token', array('oauth_callback' => $redirectUrl));
     $link = $connection->url('oauth/authorize', array('oauth_token' => $request_token['oauth_token']));
     $_SESSION['oauth_token'] = $request_token['oauth_token'];
     $_SESSION['oauth_token_secret'] = $request_token['oauth_token_secret'];
@@ -106,7 +87,9 @@ function twitter_get_posts() {
         ->condition('user_id', $user->uid)
         ->execute()
         ->fetchObject();
-    $connection = new TwitterOAuth(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, $twitterData->oauth_token, $twitterData->oauth_token_secret);
+    $consumerKey = variable_get_value('social_aggregator:TWITTER_CONSUMER_KEY');
+    $consumerSecret = variable_get_value('social_aggregator:TWITTER_CONSUMER_SECRET');
+    $connection = new TwitterOAuth($consumerKey, $consumerSecret, $twitterData->oauth_token, $twitterData->oauth_token_secret);
     $twits = $connection->get("statuses/user_timeline");
     $parsedActualTwits = [];
     foreach($twits as $index => $twit) {
@@ -115,23 +98,31 @@ function twitter_get_posts() {
         $parsedActualTwits[$index]['date_post'] = $formattedDate;
         $parsedActualTwits[$index]['content'] = $twit->text;
     }
-    //var_dump($parsedActualTwits);die;
     return $parsedActualTwits;
 }
 
-function twitter_public_post($data) {
+function twitter_publish_post($data) {
     global $user;
     $twitterData = db_select('twitter', 'tw')
         ->fields('tw', array('oauth_token', 'oauth_token_secret'))
         ->condition('user_id', $user->uid)
         ->execute()
         ->fetchObject();
-    $connection = new TwitterOAuth(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, $twitterData->oauth_token, $twitterData->oauth_token_secret);
+    $consumerKey = variable_get_value('social_aggregator:TWITTER_CONSUMER_KEY');
+    $consumerSecret = variable_get_value('social_aggregator:TWITTER_CONSUMER_SECRET');
+    $connection = new TwitterOAuth($consumerKey, $consumerSecret, $twitterData->oauth_token, $twitterData->oauth_token_secret);
     $connection->post('statuses/update', array('status' => $data->content));
-    if ($connection->getLastHttpCode() == 200) {
-        return true;
-    } else {
-        return $connection->getLastHttpCode();
-    }
-    //return true;
+    return ($connection->getLastHttpCode() == 200) ? true : false;
+}
+
+function twitter_save_user_data($arrayData) {
+    global $user;
+    return db_insert('twitter')
+        ->fields(array('user_id', 'oauth_token', 'oauth_token_secret'))
+        ->values(array(
+            'user_id' => $user->uid,
+            'oauth_token' => $arrayData['oauth_token'],
+            'oauth_token_secret' => $arrayData['oauth_token_secret'],
+        ))
+        ->execute();
 }

@@ -1,28 +1,13 @@
 <?php
 
 function main_menu() {
-    $items = array();
+    $items = [];
     $items['user/reg'] = array(
         'title' => 'Registration form',
         'page callback' => 'drupal_get_form',
         'access callback' => TRUE,
         'page arguments' => array('main_user_register_form')
     );
-  /*  $items['user/login'] = array(
-        'title' => 'Login form',
-        'page callback' => 'drupal_get_form',
-        'access callback' => TRUE,
-        'page arguments' => array('main_user_login_form')
-    );
-    $items['user/1/social'] = array(
-        'title' => 'Social aggregator',
-        'page callback' => 'main_page_callback',
-        //'access arguments' => array('access content'),
-        'access callback' => TRUE,
-        //'access arguments' => array('all'),
-        //'access arguments' => array('administer site configuration'),
-        'file' => 'main.pages.inc'
-    );*/
     $items['social'] = array(
         'title' => 'Social aggregator',
         'page callback' => 'main_page_callback',
@@ -32,43 +17,11 @@ function main_menu() {
     return $items;
 }
 
-/*function main_permission() {
-    return array(
-        'all' => array(
-            'title' => t('Access for all'),
-            'description' => t(''),
-        ),
-    );
-}*/
-
-/*function main_preprocess_page(&$variables) {
-    //var_dump($variables['user']->roles);die;
-    //if(!$variables['user']->uid && arg(0)!='user' && arg(1)!='login') {
-    if (arg(0) == 'user' && arg(1) == 'piy') {
-        //var_dump($variables['user']);die;
-        drupal_goto('user/piy');
-    }
-}*/
-
-/*function main_preprocess_node(&$variables) {
-    $node = $variables['node'];
-    var_dump($node);die;
-    switch ($node->type) {
-        case 'profile':
-            if (arg(0) == 'node' && arg(1) == $node->nid && arg(2) == "") {
-                // If we are postitive we are on node/N where N is the NID of a profile
-                // node, then redirect to the user profile page instead.
-                drupal_goto("user/$node->uid");
-            }
-    }
-}*/
-
 function main_page_callback() {
     $module_path = drupal_get_path('module', 'main');
     $content = array(
         '#markup' => '',
         '#attached' => array(
-            //'libraries_load' => array(array('backbone')),
             'js' => array(
                 array('data' => $module_path . '/js/jquery.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/underscore.js', 'type' => 'file', 'scope' => 'footer'),
@@ -77,48 +30,13 @@ function main_page_callback() {
                 array('data' => $module_path . '/js/app.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/jquery.cookie.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/app_config.js', 'type' => 'file', 'scope' => 'footer'),
-                array('data' => $module_path . '/js/app_second.js', 'type' => 'file', 'scope' => 'footer'),
+                array('data' => $module_path . '/js/app_modeler.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/app_viewer.js', 'type' => 'file', 'scope' => 'footer'),
                 array('data' => $module_path . '/js/app_routing.js', 'type' => 'file', 'scope' => 'footer'),
-                /*array('data' => $module_path . '/js/app_closer.js', 'type' => 'file', 'scope' => 'footer'),*/
-                array('data' => $module_path . '/js/app_start.js', 'type' => 'file', 'scope' => 'footer')
-            ),
-            'css' => array(
-                array('data' => $module_path . '/css/style.css', 'type' => 'file'),
-            ),
-            //'css' => array(
-                //array('data' => $module_path . '/css/style.css', 'type' => 'file', 'scope' => 'footer'),
-                //array($module_path . '/css/style.css'),
-                //$module_path . '/css/style.css'
-            //),
-        ),
+                array('data' => $module_path . '/js/app_init.js', 'type' => 'file', 'scope' => 'footer')
+            )
+        )
     );
-    //$content['#attached']['css'][] = $module_path . '/css/style.css';
-    $content['#attached']['css']['
-    #block-user-login {display: none;}
-    #mainContainer table tr:nth-child(even) {background: #f3f4ee}
-    #mainContainer table tr:nth-child(odd) {background: #fff}
-    #mainContainer .post-detail {border: 1px solid black;}
-    #mainContainer .social-detail {width:100%; border:none; height:auto}
-    //#mainContainer .social-detail div:nth-child(even) {background: #f3f4ee}
-    //#mainContainer .social-detail div:nth-child(odd) {background: #fff}
-    #mainContainer .panel-new-post {float:right; margin-top:10px; width:40%; margin-right:15px;}
-    #mainContainer .posts-wrapper {float:left; width:55%; margin-top:10px;}
-    #mainContainer .posts-wrapper div {background-color: #f8f8f8;
-        background-image: url("' . $module_path . '/css/rssinclude_item_bg.gif");
-        background-repeat: repeat-x;
-        border-bottom: 1px solid #c0c0c0;
-        border-left: 1px solid #c0c0c0;
-        border-right: 1px solid #c0c0c0;
-        padding: 10px;}
-    #mainContainer #login-form {float:left; margin-left:600px;}
-    #mainContainer #reg-form {float:right; width:50%;}
-    #noticeContainer {color:white; text-align:center;}
-    #noticeContainer .notice-error {background:red;}
-    #noticeContainer .notice-success {background:green;}
-    #noticeContainer .notice-warning {background:orange;}
-    #spinner {text-align:center; display:none;}
-    '] = array( 'type' => 'inline');
     $regForm = drupal_get_form('main_user_register_form');
     $regForm = drupal_render($regForm);
     $content['#markup'] = '
@@ -178,31 +96,6 @@ function main_page_callback() {
      </script>
      ';
     return $content;
-}
-
-function main_settings_libraries_info() {
-    $module_path = drupal_get_path('module', 'main');
-    $libraries['underscore'] = array(
-        'name' => 'underscore.js',
-        'files' => array(
-            'js' => array(
-                //$module_path . '/js/underscore.js',
-                'underscore.js',
-            ),
-        ),
-    );
-    $libraries['backbone'] = array(
-        'name' => 'backbone.js',
-        'files' => array(
-            'js' => array(
-                'backbone.js',
-            ),
-        ),
-        'dependencies' => array(
-            'underscore',
-        ),
-    );
-    return $libraries;
 }
 
 function main_user_register_form($form, &$form_state) {
@@ -298,35 +191,6 @@ function main_user_login_form($form, &$form_state) {
     return $form;
 }
 
-/*function main_perm() {
-    return array(
-        'note resource create',
-        'note resource view any note',
-        'note resource view own notes',
-        'note resource edit any note',
-        'note resource edit own notes',
-        'note resource delete any note',
-        'note resource delete own notes',
-    );
-}*/
-
-function main_get_note($id) {
-    return (db_query("SELECT * FROM {note} WHERE id=:id", array(
-        ':id' => $id,
-    ))->fetchAssoc());
-}
-
-function main_write_note($note) {
-    $primary_key = !empty($note->id) ? array('id') : NULL;
-    drupal_write_record('note', $note, $primary_key);
-}
-
-function main_delete_note($id) {
-    db_query("DELETE FROM {note} WHERE id=:id", array(
-        ':id' => $id,
-    ));
-}
-
 function main_services_resources() {
     return array(
         'social' => array(
@@ -346,15 +210,15 @@ function main_services_resources() {
                 ),
             ),
             'update' => array(
-                'help' => 'Updates a social status',
+                'help' => 'Reset a social status',
                 'file' => array('file' => 'inc', 'module' => 'main'),
-                'callback' => '_main_update',
+                'callback' => '_main_reset_social',
                 'access arguments' => array('access content'),
                 'args' => array(
                     array(
                         'name' => 'id',
                         'type' => 'int',
-                        'description' => 'The id of the social to update',
+                        'description' => 'The id of the social to reset',
                         'source' => array('path' => '0'),
                         'optional' => FALSE,
                     )
@@ -365,7 +229,7 @@ function main_services_resources() {
             'index' => array(
                 'help' => 'Retrieves a listing of posts',
                 'file' => array('file' => 'inc', 'module' => 'main'),
-                'callback' => '_main_get_posts',
+                'callback' => '_main_get_social_posts',
                 'access arguments' => array('access content'),
                 'args' => array(
                     array(
@@ -443,41 +307,71 @@ function main_services_resources() {
     );
 }
 
-function getSocials() {
-    //var_dump(getTwitterAccount());die;
-    $arr = [];
-    $arr['twitter'] = getTwitterAccount();
-    $arr['facebook'] = true;
-    $arr['instagram'] = false;
-    return $arr;
+function main_variable_info($options) {
+    $variables['social_aggregator:BASE_URL_AUTH'] = array(
+        'title' => t('Base url for authenticate', array(), $options),
+        'access' => 'administer',
+        'type' => 'string',
+        'default' => 'http://localhost/drupal_task_1/notes'
+    );
+    $variables['social_aggregator:FACEBOOK_APP_ID'] = array(
+        'title' => t('Facebook application ID', array(), $options),
+        'access' => 'administer',
+        'type' => 'string',
+        'default' => '1640010319548174'
+    );
+    $variables['social_aggregator:FACEBOOK_APP_SECRET'] = array(
+        'title' => t('Facebook application sercret', array(), $options),
+        'access' => 'administer',
+        'type' => 'string',
+        'default' => '7d64b5c69e9b6759bf781fb4a4868622'
+    );
+    $variables['social_aggregator:FACEBOOK_APP_REDIRECT_URL'] = array(
+        'title' => t('Facebook application redirect url', array(), $options),
+        'access' => 'administer',
+        'type' => 'string',
+        'default' => 'http://localhost/drupal_task_1/social?social=facebook'
+    );
+    $variables['social_aggregator:INSTAGRAM_ID'] = array(
+        'title' => t('Instagram application ID', array(), $options),
+        'access' => 'administer',
+        'type' => 'string',
+        'default' => '0a8c859217034967b1aec64ee5a1d9fc'
+    );
+    $variables['social_aggregator:INSTAGRAM_SECRET'] = array(
+        'title' => t('Instagram application secret', array(), $options),
+        'access' => 'administer',
+        'type' => 'string',
+        'default' => '65bf77bcf7dc42d3b55e39b88e19b983'
+    );
+    $variables['social_aggregator:INSTAGRAM_CALLBACK'] = array(
+        'title' => t('Instagram application redirect url', array(), $options),
+        'access' => 'administer',
+        'type' => 'string',
+        'default' => 'http://localhost/drupal_task_1/social?social=instagram'
+    );
+    $variables['social_aggregator:TWITTER_CONSUMER_KEY'] = array(
+        'title' => t('Twitter application consumer key', array(), $options),
+        'access' => 'administer',
+        'type' => 'string',
+        'default' => 'Jt4lGWjVOJqvUalFyv911Dbkr'
+    );
+    $variables['social_aggregator:TWITTER_CONSUMER_SECRET'] = array(
+        'title' => t('Twitter application consumer secret', array(), $options),
+        'access' => 'administer',
+        'type' => 'string',
+        'default' => 'LU32tiMn5NmCHzlfMTgFrmJjnPXsaaAfqQNTefdnoR1e3pcXqo'
+    );
+    $variables['social_aggregator:TWITTER_OAUTH_CALLBACK'] = array(
+        'title' => t('Twitter application redirect url', array(), $options),
+        'access' => 'administer',
+        'type' => 'string',
+        'default' => 'http://localhost/drupal_task_1/social?social=twitter'
+    );
+    return $variables;
 }
 
 function main_save_social_data($arrayData) {
-    global $user;
-    if ($arrayData['social'] == 'twitter') {
-        db_insert('twitter')
-            ->fields(array('user_id', 'oauth_token', 'oauth_token_secret'))
-            ->values(array(
-                'user_id' => $user->uid,
-                'oauth_token' => $arrayData['oauth_token'],
-                'oauth_token_secret' => $arrayData['oauth_token_secret'],
-            ))
-            ->execute();
-    } elseif ($arrayData['social'] == 'instagram') {
-        db_insert('instagram')
-            ->fields(array('user_id', 'access_token'))
-            ->values(array(
-                'user_id' => $user->uid,
-                'access_token' => $arrayData['access_token']
-            ))
-            ->execute();
-    } elseif ($arrayData['social'] == 'facebook') {
-        db_insert('facebook')
-            ->fields(array('user_id', 'access_token'))
-            ->values(array(
-                'user_id' => $user->uid,
-                'access_token' => $arrayData['access_token']
-            ))
-            ->execute();
-    }
+    module_load_include('inc', 'main', 'main');
+    _main_save_social_data($arrayData);
 }

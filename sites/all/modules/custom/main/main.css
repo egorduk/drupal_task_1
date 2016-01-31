@@ -1,0 +1,21 @@
+#block-user-login {display: none;}
+#mainContainer table tr:nth-child(even) {background: #f3f4ee}
+#mainContainer table tr:nth-child(odd) {background: #fff}
+#mainContainer .post-detail {border: 1px solid black;}
+#mainContainer .social-detail {width:100%; border:none; height:auto}
+#mainContainer .panel-new-post {float:right; margin-top:10px; width:40%; margin-right:15px;}
+#mainContainer .posts-wrapper {float:left; width:55%; margin-top:10px;}
+#mainContainer .posts-wrapper div {background-color: #f8f8f8;
+    background-image: url("images/rssinclude_item_bg.gif");
+    background-repeat: repeat-x;
+    border-bottom: 1px solid #c0c0c0;
+    border-left: 1px solid #c0c0c0;
+    border-right: 1px solid #c0c0c0;
+    padding: 10px;}
+#mainContainer #login-form {float:left; margin-left:600px;}
+#mainContainer #reg-form {float:right; width:50%;}
+#noticeContainer {color:white; text-align:center;}
+#noticeContainer .notice-error {background:red;}
+#noticeContainer .notice-success {background:green;}
+#noticeContainer .notice-warning {background:orange;}
+#spinner {text-align:center; display:none;}

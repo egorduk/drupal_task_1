@@ -1,14 +1,34 @@
 app.SocialViewer = function(){
-    var SocialViewer = {};
-    var SocialDetailItemView = Backbone.Marionette.ItemView.extend({
-        template: "#social-item-template",
-        initialize: function(){
-            //console.log('SocialDetailItemView: initialize');
+    var SocialViewer = {},
+        noticeView;
+
+    var NoticeView = Backbone.Marionette.ItemView.extend({
+        template: "#notice-item",
+        notice: '',
+        type: '',
+        events: {
+            'click': 'closeNotice'
         },
         onRender: function() {
-            //console.log('SocialDetailItemView: onRender');
+            this.closeNotice();
+            this.$el.addClass('notice-' + this.type);
+            this.$el.html(this.notice);
+        },
+        closeNotice: function() {
+            this.$el.empty();
+            this.$el.removeClass();
+        },
+        viewNotice: function(notice, type) {
+            this.notice = notice;
+            this.type = type;
+            app.SocialViewer.layout.noticeContainer.show(this.render());
         }
     });
+
+    var SocialDetailItemView = Backbone.Marionette.ItemView.extend({
+        template: "#social-item-template"
+    });
+
     var SocialDetailListView = Backbone.Marionette.CompositeView.extend({
         template: "#social-list-template",
         className: "social-detail",
@@ -19,62 +39,41 @@ app.SocialViewer = function(){
         },
         addNewPost: function() {
             var textareaEl = this.$el.find('textarea'),
-                postText = textareaEl.val(),
-                self = this;
+                postText = textareaEl.val();
             if (postText.length <= 3) {
-                NoticeView.viewNotice('Too little message (need more then 3 letters)', 'warning');
+                noticeView.viewNotice('Too little message (need more then 3 letters)', 'warning');
                 return;
             }
             app.spinnerShow();
-            var post = new app.LibraryApp.PostModel({
+            var post = new app.SocialModeler.PostModel({
                 content: postText,
-                date_post: new Date().getCurrentFormatedDate(),
-                social_name: app.LibraryApp.PostCollection.socialName
+                date_post: new Date().getCurrentFormattedDate(),
+                social_name: app.SocialModeler.PostCollection.socialName
             });
             textareaEl.val("");
             post.save({}, {
-                success: function (model, response) {
+                success: function (model) {
                     app.spinnerHide();
-                    NoticeView.viewNotice('Posted!', 'success');
-                    app.LibraryApp.PostCollection.add(model, {at: 0});
+                    noticeView.viewNotice('Published', 'success');
+                    app.SocialModeler.PostCollection.add(model, {at: 0});
                 },
-                error: function (model, response) {
-                    NoticeView.viewNotice('Something wrong', 'error');
+                error: function () {
+                    noticeView.viewNotice('Something wrong', 'error');
                 }
             });
         },
-        initialize: function(){
-            //console.log('SocialDetailListView: initialize');
-        },
-        onRender: function() {
-            //console.log('SocialDetailListView: onRender');
-        },
-        /* onAfterRender: function() {
-         var self = this;
-         app.vent.on("test", function(){
-         self.$el.find('.posts-wrapper').find('div:first').addClass('new');
-         });
-         },*/
         hidePostPanel: function(socialName) {
             var panelNewPost = this.$el.find('.panel-new-post');
             (socialName === 'instagram') ? panelNewPost.hide() : panelNewPost.show();
+        },
+        onBeforeRender: function() {
+            app.menu.showLogout('<a class="link-logout" href="' + app.ConfigApp.projectFolder + 'user/logout">Logout</a>');
         }
-        /*collectionEvents: {
-         "add": "modelAdded"
-         },
-         modelAdded: function() {
-         app.vent.trigger("test");
-         }*/
     });
-    var NoticeView = new app.NoticeView();
+
     var SocialRowView = Backbone.Marionette.ItemView.extend({
         template: _.template($('#item-template').html()),
         tagName: "tr",
-        initialize: function() {
-            //console.log('SocialRowView: initialize');
-            //this.listenTo(this.model, 'change', this.change);
-            //this.listenTo(this.model, 'destroy', this.destroy);
-        },
         events: {
             'click .reset': 'clickReset'
         },
@@ -88,44 +87,41 @@ app.SocialViewer = function(){
                     '<a class="view" href="#view/' + socialName + '">View</a> | ' +
                     '<a class="reset">Reset</a>') :
                 statusCell.html('<span class="status-false"></span><a href="' + socialSyncLink + '">Sync</a>');
-            console.log('SocialRowView: onRender');
         },
-        //change: function () {
-        //console.log('SocialRowView: change');
-        //this.render();
-        //},
-        //destroy: function() {
-        //console.log('SocialRowView: destroy');
-        //},
         clickReset: function () {
             var self = this;
             self.model.save({'status': null}, {
                 success: function(model, response) {
-                    if (response.result) {
-                        NoticeView.viewNotice('Done!', 'success');
+                    if (response.hasOwnProperty('responseText') && response.responseText) {
+                        noticeView.viewNotice('Done!', 'success');
                         self.render();
                         app.SessionHelper.setItem("status:" + self.model.get("name"), self.model.get("status"));
+                    } else {
+                        noticeView.viewNotice('Something wrong', 'error');
                     }
                 },
                 error: function(model, response) {
                     if (response.hasOwnProperty('responseText') && response.responseText != "") {
-                        NoticeView.viewNotice($.parseJSON(response.responseText)[0], 'error');
+                        noticeView.viewNotice($.parseJSON(response.responseText)[0], 'error');
                     } else {
-                        NoticeView.viewNotice('Something wrong', 'error');
+                        noticeView.viewNotice('Something wrong', 'error');
                     }
                 },
                 wait: true
             });
         }
     });
+
     var SocialListView = Backbone.Marionette.CompositeView.extend({
         tagName: "table",
         template: "#list-template",
         childView: SocialRowView,
         onBeforeRender: function() {
+            noticeView.closeNotice();
             app.menu.showLogout('<a class="link-logout" href="' + app.ConfigApp.projectFolder + 'user/logout">Logout</a>');
         }
     });
+
     var AuthView = Backbone.Marionette.ItemView.extend({
         template: "#auth-template",
         events: {
@@ -135,22 +131,18 @@ app.SocialViewer = function(){
         userModel: '',
         sessionId: '',
         initialize: function() {
-            //console.log('AuthView: initialize');
-            this.userModel = new app.LibraryApp.UserModel();
-        },
-        onRender: function() {
-            // console.log('AuthView: onRender');
+            this.userModel = new app.SocialModeler.UserModel();
         },
         loginSubmit: function(e) {
+            var self = this;
             e.preventDefault();
             var username = this.$el.find('#login-username').val(),
                 password = this.$el.find('#login-password').val();
             if (username == "" || password == "") {
-                NoticeView.viewNotice('Missing attribute', 'warning');
+                noticeView.viewNotice('Missing attribute', 'warning');
                 return;
             }
             this.userModel.set({ username: username, password: password });
-            var self = this;
             self.fetchUser();
         },
         regSubmit: function(e) {
@@ -160,11 +152,11 @@ app.SocialViewer = function(){
                 password = this.$el.find('#reg-pass').val(),
                 approvePassword = this.$el.find('#reg-approve-pass').val();
             if (username == "" || password == "" || email == "" || approvePassword == "") {
-                NoticeView.viewNotice('Missing attribute', 'warning');
+                noticeView.viewNotice('Missing attribute', 'warning');
                 return;
             }
             app.spinnerShow();
-            this.userModel = new app.LibraryApp.UserModel({
+            this.userModel = new app.SocialModeler.UserModel({
                 username: username,
                 password: password,
                 email: email,
@@ -177,9 +169,9 @@ app.SocialViewer = function(){
             var self = this;
             this.userModel.fetch({}).fail(function(response){
                 if (response.hasOwnProperty('responseText') && response.responseText != "") {
-                    NoticeView.viewNotice($.parseJSON(response.responseText)[0], 'error');
+                    noticeView.viewNotice($.parseJSON(response.responseText)[0], 'error');
                 } else {
-                    NoticeView.viewNotice('Something wrong', 'error');
+                    noticeView.viewNotice('Something wrong', 'error');
                 }
             }).done(function(response) {
                 app.spinnerHide();
@@ -189,11 +181,9 @@ app.SocialViewer = function(){
                     $.cookie('social_session_id', self.sessionId);
                     $.cookie('social_session_token', response.token);
                     self.hideAuthPanels();
-                    app.LibraryApp.home();
-                    //app.SocialViewer.showTableSocial(app.LibraryApp.SocialCollection);
-                    //app.vent.trigger("social:getSocials");
+                    app.SocialModeler.home();
                 } else {
-                    NoticeView.viewNotice(response[0], 'error');
+                    noticeView.viewNotice(response[0], 'error');
                 }
             });
         },
@@ -202,56 +192,67 @@ app.SocialViewer = function(){
             this.userModel.save({}, {
                 success: function () {
                     app.spinnerHide();
-                    NoticeView.viewNotice('Created! Please log in using your new account', 'success');
+                    noticeView.viewNotice('Created! Please log in using your new account', 'success');
                     self.clearFields();
                 },
                 error: function (model, response) {
                     if (response.hasOwnProperty('responseText') && response.responseText != "") {
-                        NoticeView.viewNotice($.parseJSON(response.responseText)[0], 'error');
+                        noticeView.viewNotice($.parseJSON(response.responseText)[0], 'error');
                     } else {
-                        NoticeView.viewNotice('Something wrong', 'error');
+                        noticeView.viewNotice('Something wrong', 'error');
                     }
                 }
             });
         },
         hideAuthPanels: function() {
             this.$el.empty();
-            NoticeView.closeNotice();
         },
         clearFields: function() {
             this.$el.find('input[type="text"]').val("");
             this.$el.find('input[type="password"]').val("");
+        },
+        onBeforeRender: function() {
+            noticeView.closeNotice();
+        }
+    });
+
+    var Layout = Backbone.Marionette.LayoutView.extend({
+        template: "#layout-template",
+        regions: {
+            mainContainer: "#mainContainer",
+            noticeContainer: "#noticeContainer"
         }
     });
 
     SocialViewer.showTableSocial = function(socials){
         var socialListView = new SocialListView({ collection: socials });
-        app.LibraryApp.layout.mainContainer.show(socialListView);
+        SocialViewer.layout.mainContainer.show(socialListView);
     };
+
     SocialViewer.showSocialDetails = function(posts, socialName){
         var socialDetailView = new SocialDetailListView({ collection: posts });
-        app.LibraryApp.layout.mainContainer.show(socialDetailView);
+        SocialViewer.layout.mainContainer.show(socialDetailView);
         socialDetailView.hidePostPanel(socialName);
     };
-    //SocialViewer.authView = new AuthView();
+
     SocialViewer.showAuth = function(){
         app.SocialViewer.authView = new AuthView();
-        //console.log(app.SocialViewer.authView);
-        app.LibraryApp.layout.mainContainer.show(app.SocialViewer.authView);
+        SocialViewer.layout.mainContainer.show(app.SocialViewer.authView);
     };
+
+    SocialViewer.initializeLayout = function() {
+        SocialViewer.layout = new Layout();
+        SocialViewer.layout.on("show", function() {
+            app.vent.trigger("layout:rendered");
+        });
+        app.contentRegion.show(SocialViewer.layout);
+        noticeView = new NoticeView();
+    };
+
     return SocialViewer;
 }();
 
-Date.prototype.toMysqlFormat = function() {
-    function twoDigits(d) {
-        if (0 <= d && d < 10) return "0" + d.toString();
-        if (-10 < d && d < 0) return "-0" + (-1 * d).toString();
-        return d.toString();
-    }
-    return this.getUTCFullYear() + "-" + twoDigits(1 + this.getUTCMonth()) + "-" + twoDigits(this.getUTCDate()) + " " + twoDigits(this.getUTCHours()) + ":" + twoDigits(this.getUTCMinutes()) + ":" + twoDigits(this.getUTCSeconds());
-};
-
-Date.prototype.getCurrentFormatedDate = function() {
+Date.prototype.getCurrentFormattedDate = function() {
     var today = new Date(),
         dd = today.getDate(),
         mm = today.getMonth() + 1,

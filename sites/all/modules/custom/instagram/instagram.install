@@ -22,5 +22,7 @@ function instagram_schema() {
 }
 
 function instagram_install() {
-    drupal_install_schema('instagram');
+    if (!db_table_exists('instagram')) {
+        drupal_install_schema('instagram');
+    }
 }

@@ -1,22 +1,10 @@
 <?php
 
-namespace MetzWeb\Instagram;
-require_once 'InstagramException.php';
+namespace Instagram;
 
-/**
- * Instagram API class
- *
- * API Documentation: http://instagram.com/developer/
- * Class Documentation: https://github.com/cosenary/Instagram-PHP-API
- *
- * @author Christian Metz
- * @since 30.10.2011
- * @copyright Christian Metz - MetzWeb Networks 2011-2014
- * @version 2.2
- * @license BSD http://www.opensource.org/licenses/bsd-license.php
- */
-class Instagram
-{
+//require_once 'InstagramException.php';
+
+class Instagram {
     /**
      * The API base URL.
      */
@@ -95,7 +83,6 @@ class Instagram
      *
      * @return void
      *
-     * @throws \MetzWeb\Instagram\InstagramException
      */
     public function __construct($config)
     {
@@ -119,7 +106,6 @@ class Instagram
      *
      * @return string Instagram OAuth login URL
      *
-     * @throws \MetzWeb\Instagram\InstagramException
      */
     public function getLoginUrl($scopes = array('basic'))
     {
@@ -292,7 +278,6 @@ class Instagram
      *
      * @return mixed
      *
-     * @throws \MetzWeb\Instagram\InstagramException
      */
     public function modifyRelationship($action, $user)
     {
@@ -510,7 +495,6 @@ class Instagram
      *
      * @return mixed
      *
-     * @throws \MetzWeb\Instagram\InstagramException
      */
     public function pagination($obj, $limit = 0)
     {
@@ -571,8 +555,6 @@ class Instagram
      * @param string $method Request type GET|POST
      *
      * @return mixed
-     *
-     * @throws \MetzWeb\Instagram\InstagramException
      */
     protected function _makeCall($function, $auth = false, $params = null, $method = 'GET')
     {
@@ -648,8 +630,6 @@ class Instagram
      * @param array $apiData The post API data
      *
      * @return mixed
-     *
-     * @throws \MetzWeb\Instagram\InstagramException
      */
     private function _makeOAuthCall($apiData)
     {

@@ -23,5 +23,7 @@ function twitter_schema() {
 }
 
 function twitter_install() {
-    drupal_install_schema('twitter');
+    if (!db_table_exists('twitter')) {
+        drupal_install_schema('twitter');
+    }
 }

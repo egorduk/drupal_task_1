@@ -1,23 +1,13 @@
 <?php
 
-//define("FACEBOOK_APP_ID", "1035129189845262");
-define("FACEBOOK_APP_ID", "1640010319548174");
-//define("FACEBOOK_APP_SECRET", "1e121667b64b99f97148211d7df38a60");
-define("FACEBOOK_APP_SECRET", "7d64b5c69e9b6759bf781fb4a4868622");
-define("FACEBOOK_APP_REDIRECT_URL", "http://localhost/drupal_task_1/social?social=facebook");
-//define("FACEBOOK_APP_REDIRECT_URL", "http://drupaltask.esy.es/project/user/test?social=facebook");
-define("FACEBOOK_DIALOG_URL", "https://www.facebook.com/dialog/oauth");
-define("FACEBOOK_FEED", "https://graph.facebook.com/me/feed");
-
 function facebook_entity_info() {
     $return = array(
         'facebook' => array(
             'label' => t('Facebook'),
-            'entity class' => 'Facebook1',
+            'entity class' => 'Facebook',
             'controller class' => 'FacebookController',
             'base table' => 'facebook',
             'fieldable' => TRUE,
-            'load hook' => 'facebook_load',
             'module' => 'facebook',
             'entity keys' => array(
                 'id' => 'fid',
@@ -46,25 +36,7 @@ function facebook_entity_info() {
 
 
 function facebook_menu() {
-    $items['admin/config/facebook'] = array(
-        'title callback' => '',
-        //'title arguments' => array('twitter', 1),
-        'page callback' => 'facebook_page_view',
-        //'page arguments' => array(1),
-        //'access callback' => TRUE,
-        'access arguments' => array('administer site configuration'),
-        'file' => 'facebook.pages.inc',
-    );
-    return $items;
-}
-
-function facebook_load($twitter_id, $reset = FALSE) {
-    $products = facebook_load_multiple(array($twitter_id), array(), $reset);
-    return $products ? reset($products) : FALSE;
-}
-
-function facebook_load_multiple($product_ids = array(), $conditions = array(), $reset = FALSE) {
-    return entity_load('facebook', $product_ids, $conditions, $reset);
+    return array();
 }
 
 function facebook_load_by_user() {
@@ -76,13 +48,6 @@ function facebook_load_by_user() {
 }
 
 function facebook_get_auth_link() {
-    /*$params = array(
-        'client_id'     => FACEBOOK_APP_ID,
-        'redirect_uri'  => FACEBOOK_APP_REDIRECT_URL,
-        'response_type' => 'code',
-        'scope'         => 'publish_actions, user_posts'
-    );
-    return FACEBOOK_DIALOG_URL . '?' . urldecode(http_build_query($params));*/
     $module_path = drupal_get_path('module', 'facebook');
     require_once $module_path . '/FacebookHelper.php';
     $a = new FacebookHelper();
@@ -111,7 +76,7 @@ function facebook_get_posts() {
     return $parsedFeeds;
 }
 
-function facebook_public_post($data) {
+function facebook_publish_post($data) {
     global $user;
     $facebookAccessToken = db_select('facebook', 'fb')
         ->fields('fb', array('access_token'))
@@ -123,7 +88,7 @@ function facebook_public_post($data) {
     $fbHelper = new FacebookHelper();
     $fbHelper->setAccessToken($facebookAccessToken);
     $fbHelper->postMessage(array('message' => $data->content));
-    return true;
+    return ($fbHelper->getStatusCode() == 200) ? true : false;
 }
 
 function facebook_reset($id) {
@@ -131,5 +96,16 @@ function facebook_reset($id) {
     return db_delete('facebook')
         ->condition('user_id', $user->uid)
         ->condition('fid', $id)
+        ->execute();
+}
+
+function facebook_save_user_data($arrayData) {
+    global $user;
+    return db_insert('facebook')
+        ->fields(array('user_id', 'access_token'))
+        ->values(array(
+            'user_id' => $user->uid,
+            'access_token' => $arrayData['access_token']
+        ))
         ->execute();
 }
